@@ -27,8 +27,6 @@ export default function Footer() {
           </div>
           <ul className="dev-credit-links">
             <li><a href="https://wa.me/6285357495414" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">💬</span> 0853-5749-5414</a></li>
-            <li><a href="https://instagram.com/zhiantech" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">📷</span> @zhiantech</a></li>
-            <li><a href="https://www.zhiantech.id" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">🌐</span> www.zhiantech.id</a></li>
           </ul>
         </div>
         <div className="copy"><span>© {new Date().getFullYear()} UPT SMPN 1 Baradatu. All Rights Reserved.</span><small>Developed by Dodi Sujatmiko · Zhian Tech</small></div>

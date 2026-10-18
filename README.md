@@ -23,6 +23,8 @@ Website publik hanya menampilkan data yang **sudah diterbitkan** di panel admin.
    ```
 5. **Authentication → Sign In / Providers → Email**: matikan **Allow new users to sign up**, supaya orang lain tidak bisa mendaftar sendiri. Akun baru dibuat oleh superadmin dari dashboard Supabase.
 
+**Menambah pengguna lain** (operator, guru): buat akunnya di **Authentication → Users → Add user** (centang *Auto Confirm User*), lalu atur perannya dari panel admin, di menu **Sistem → Pengguna & Peran** (khusus superadmin). Tidak perlu menulis SQL lagi.
+
 | Peran | Hak akses |
 |---|---|
 | `superadmin` | Semua, termasuk mengatur peran pengguna |

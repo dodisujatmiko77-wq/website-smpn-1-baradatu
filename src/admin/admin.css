@@ -37,3 +37,14 @@
 .admin-disabled code{background:#f1f5f9;padding:1px 6px;border-radius:6px}
 .form-grid select,.form-grid textarea{display:block;margin-top:6px;font:400 14px Inter}
 .form-grid input[type=color]{height:44px;padding:4px}
+
+/* Pengguna & Peran */
+.users-steps{margin:0 0 16px;padding-left:20px;display:grid;gap:8px;font-size:13px;color:#334155;line-height:1.6}
+.users-steps a{color:#1976d2;font-weight:700}
+.users-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.users-roles div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px}
+.users-roles b,.users-roles small{display:block}.users-roles b{font-size:13px}.users-roles small{color:#64748b;font-size:11px;margin-top:3px;line-height:1.5}
+.users-toolbar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #edf2f7;font-size:13px}
+.users-pending td{background:#fffbeb}
+.table-card select{padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;font-size:12px;background:#fff}
+@media(max-width:800px){.users-roles{grid-template-columns:1fr}}

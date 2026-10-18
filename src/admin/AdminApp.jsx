@@ -30,6 +30,7 @@ import { galleryData } from '../data/galleryData';
 import { digitalServices } from '../data/digitalServices';
 import StaffManager from './StaffManager';
 import ImageField from './ImageField';
+import UsersManager from './UsersManager';
 import { ContactSettings, ExtraManager, PpdbSettings } from './SettingsAdmin';
 import './admin.css';
 
@@ -173,6 +174,7 @@ const sidebarGroups = [
     ['Layanan Digital','/admin/konten/services','🔗'],
   ]},
   { key:'sistem', label:'SISTEM', items:[
+    ['Pengguna & Peran','/admin/pengguna','👥', 'superadmin'],
     ['Audit Log','/admin/audit','◷'],
   ]},
 ];
@@ -188,7 +190,7 @@ function Layout({ session, onLogout }) {
     lainnya: location.pathname === '/admin/ekstrakurikuler' || location.pathname.startsWith('/admin/pengaturan/'),
     konten: location.pathname.startsWith('/admin/konten/'),
     layanan: location.pathname === '/admin/konten/services',
-    sistem: location.pathname === '/admin/audit',
+    sistem: location.pathname === '/admin/audit' || location.pathname === '/admin/pengguna',
   }));
   const title = menu.find(item => item[1] === location.pathname)?.[0] || (location.pathname === '/admin/data-sekolah' ? 'Data Sekolah' : 'Kelola Konten');
   useEffect(() => {
@@ -209,7 +211,7 @@ function Layout({ session, onLogout }) {
   return <div className="admin-shell">
     <aside className="admin-side">
       <div className="admin-brand"><div className="admin-logo">SB</div><div><strong>SMPN 1 BARADATU</strong><span>Website Control</span></div></div>
-      <nav>{sidebarGroups.map(group => <div className={`nav-group ${openGroups[group.key] ? 'open' : ''}`} key={group.key}>
+      <nav>{sidebarGroups.map(group => ({ ...group, items: group.items.filter(item => !item[3] || item[3] === session?.role) })).map(group => <div className={`nav-group ${openGroups[group.key] ? 'open' : ''}`} key={group.key}>
         <button className="nav-group-head" type="button" onClick={() => setOpenGroups(prev => ({ ...prev, [group.key]: !prev[group.key] }))}>
           <span>{group.label}</span><b aria-hidden="true">⌄</b>
         </button>
@@ -221,7 +223,7 @@ function Layout({ session, onLogout }) {
       <header className="admin-top"><div><span className="crumb">PANEL KONTROL</span><h2>{title}</h2></div><Link className="view-site" to="/">Lihat Website ↗</Link></header>
       <div className="admin-content"><Routes>
         <Route index element={<Dashboard/>}/><Route path="homepage" element={<Homepage/>}/><Route path="data-sekolah" element={<DataSekolah/>}/><Route path="data-sekolah/:module" element={<SchoolSingle/>}/><Route path="profil" element={<Profil/>}/><Route path="fasilitas" element={<FacilityManager/>}/>
-        <Route path="gtk/:kind" element={<StaffManager/>}/><Route path="konten/:type" element={<Manager/>}/><Route path="ekstrakurikuler" element={<ExtraManager/>}/><Route path="pengaturan/ppdb" element={<PpdbSettings/>}/><Route path="pengaturan/kontak" element={<ContactSettings/>}/><Route path="audit" element={<Audit/>}/>
+        <Route path="gtk/:kind" element={<StaffManager/>}/><Route path="konten/:type" element={<Manager/>}/><Route path="ekstrakurikuler" element={<ExtraManager/>}/><Route path="pengaturan/ppdb" element={<PpdbSettings/>}/><Route path="pengaturan/kontak" element={<ContactSettings/>}/><Route path="pengguna" element={<UsersManager session={session}/>}/><Route path="audit" element={<Audit/>}/>
       </Routes></div>
     </main>
   </div>;

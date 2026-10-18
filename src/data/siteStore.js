@@ -304,3 +304,17 @@ export async function uploadMedia(file, folder = 'umum') {
   if (error) throw error;
   return supabase.storage.from('site-media').getPublicUrl(path).data.publicUrl;
 }
+
+// --- Pengguna & peran (khusus superadmin, lewat fungsi database admin_*) ----------
+export async function listUsers() {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Fitur ini aktif setelah Supabase terhubung.');
+  const { data, error } = await supabase.rpc('admin_list_users');
+  if (error) throw error;
+  return data || [];
+}
+
+export async function setUserRole(userId, role) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Fitur ini aktif setelah Supabase terhubung.');
+  const { error } = await supabase.rpc('admin_set_user_role', { target_user: userId, new_role: role || null });
+  if (error) throw error;
+}

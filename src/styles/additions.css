@@ -76,3 +76,22 @@
 .contact-page .contact-cards-3>.contact-card:first-child{grid-column:1/-1}
 .contact-card-body span{overflow-wrap:break-word}
 @media(max-width:760px){.contact-page .kc.contact-cards-3{grid-template-columns:1fr}}
+
+/* ===== Hero: motto JUARA & statistik ===== */
+.hero-motto{margin:14px 0 20px}
+.hero-motto-label{display:block;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin-bottom:8px}
+.hero-motto-label b{color:#fbbf24;letter-spacing:.3em;margin-left:4px}
+.hero-motto ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.hero-motto li{display:flex;align-items:baseline;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:14px;font-weight:600}
+.hero-motto li b{color:#fbbf24;font:800 18px/1 var(--hf);margin-right:1px}
+
+.hero .stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.hero .stat{display:flex;align-items:center;gap:12px;min-width:0;padding:10px 18px 10px 10px;border-radius:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(4,25,52,.18)}
+.hero .stats .stat-icon{width:42px;height:42px;margin:0;border:0;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#3b2300;box-shadow:0 4px 12px rgba(245,158,11,.35);flex:none}
+.hero .stats b{display:block;font:800 26px/1 var(--hf);letter-spacing:.01em}
+.hero .stat>div>span{display:block;margin-top:4px;font-size:12px;font-weight:500;opacity:.9}
+@media(max-width:760px){
+  .hero-motto ul{gap:6px}.hero-motto li{font-size:12px;padding:5px 11px}.hero-motto li b{font-size:15px}
+  .hero .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .hero .stat{padding:8px 12px 8px 8px}.hero .stats .stat-icon{width:36px;height:36px}.hero .stats b{font-size:21px}
+}

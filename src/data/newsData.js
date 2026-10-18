@@ -1,0 +1,2 @@
+// DATA CONTOH — ganti dengan berita asli
+export const newsData=[["Sekolah","[Tanggal]","[Judul berita contoh 1]","[Ringkasan berita contoh]"],["Prestasi","[Tanggal]","[Judul berita contoh 2]","[Ringkasan berita contoh]"],["Akademik","[Tanggal]","[Judul berita contoh 3]","[Ringkasan berita contoh]"],["Kegiatan","[Tanggal]","[Judul berita contoh 4]","[Ringkasan berita contoh]"]].map(([k,d,j,r])=>({kategori:k,tanggal:d,judul:j,ringkasan:r,foto:""}));

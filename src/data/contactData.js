@@ -1,0 +1,1 @@
+export const contactData={alamat:"[Alamat Sekolah]",telp:"[08xxxxxxxxxx]",email:"[email@sekolah.sch.id]",jam:"Senin - Jumat, [00.00 - 00.00 WIB]",wa:"#",maps:"#",sosmed:[["Facebook","#"],["Instagram","#"],["YouTube","#"],["TikTok","#"]]};

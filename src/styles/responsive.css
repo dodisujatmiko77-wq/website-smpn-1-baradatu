@@ -1,0 +1,40 @@
+@media(max-width:1240px){
+.nav{display:flex;height:68px;gap:12px}
+.nav .brand{flex:1;min-width:0}
+#nav{position:absolute;left:0;right:0;top:68px;background:var(--card);max-height:0;overflow:auto;transition:max-height .3s;box-shadow:var(--sh);display:block}
+#nav.open{max-height:calc(100vh - 68px)}
+#nav ul{flex-direction:column;align-items:stretch;gap:2px;padding:8px 20px 16px}
+#nav li>a,#nav li>button{width:100%;justify-content:flex-start;text-align:left;padding:12px 10px;min-height:44px}
+.nav-actions{display:none}
+.dd{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:0;display:none;padding:0 0 0 12px}.dd:before{display:none}.dd.open{display:block}}
+@media(max-width:800px){.heroimg{width:100%}.heroimg .hp{padding:0}.heroimg::after{background:linear-gradient(180deg,rgba(15,76,129,.9),rgba(15,76,129,.78))}}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+@media(max-width:480px){.sam{grid-template-columns:1fr}.sam .ph{max-width:200px}}
+@media(max-width:700px){.prof{grid-template-columns:1fr}}
+@media(max-width:900px){.vgrid{grid-template-columns:1fr}}
+@media(max-width:1000px){.news{grid-template-columns:1fr}}
+@media(max-width:1000px){.dgrid{grid-template-columns:1fr}}
+@media(max-width:900px){.kg{grid-template-columns:1fr}}
+@media(max-width:500px){.kc{grid-template-columns:1fr}}
+@media(max-width:800px){.fg{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.fg{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ===== Locked: Profil Sekolah v2 responsive ===== */
+@media(max-width:800px){
+  .profile-overview{grid-template-columns:1fr}
+  .profile-photo-card,.profile-photo-card>.ph{min-height:280px}
+}
+@media(max-width:560px){
+  .breadcrumb{margin-bottom:18px}
+  .profile-identity,.profile-about,.profile-highlight{padding:18px}
+  .profile-card-head{flex-direction:column;align-items:flex-start}
+  .profile-info-row{grid-template-columns:1fr;gap:2px}
+  .profile-highlights{grid-template-columns:1fr}
+  .profile-photo-card,.profile-photo-card>.ph{min-height:240px}
+}
+
+/* ===== Locked: Sejarah Sekolah v1 responsive ===== */
+@media(max-width:800px){.history-intro{grid-template-columns:1fr}.history-empty{align-items:flex-start;padding:24px}.history-highlights{grid-template-columns:1fr}}
+@media(max-width:480px){.history-empty{flex-direction:column}.history-empty-icon{width:52px;height:52px;flex-basis:52px}}

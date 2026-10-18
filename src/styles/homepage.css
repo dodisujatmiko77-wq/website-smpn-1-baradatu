@@ -1,0 +1,239 @@
+
+/* Master homepage alignment — follows the approved school homepage mockup */
+.home-page .home-section{padding:24px 0}
+.home-page .home-profile{padding:22px 0}
+.home-page .compact-section{padding:18px 0}
+.home-page .home-pair{display:grid;gap:26px;align-items:start}
+.home-page .agenda-prestasi{grid-template-columns:1.35fr 1fr}
+.home-page .ekskul-galeri{grid-template-columns:1fr 1.35fr}
+
+/* Header */
+.nav{height:58px;gap:12px}
+.brand{gap:8px}
+.logo{width:40px;height:40px}
+.brand b{font-size:13px}
+.brand small{font-size:11px}
+nav ul{gap:0}
+nav li>a,nav li>button{font-size:13px;padding:8px 9px}
+.nav>.btn{min-height:38px;padding:8px 13px;font-size:12px;border-radius:9px}
+.search-btn{width:38px;height:38px;border:1px solid var(--line);background:#fff;border-radius:9px;color:var(--p);font-size:23px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.search-btn:hover{background:var(--soft)}
+#burger{font-size:23px}
+
+/* Hero — full-width photo with blue overlay */
+.hero{min-height:350px;padding:0;display:flex;align-items:stretch;position:relative;isolation:isolate}
+.heroimg{position:absolute;inset:0;width:100%;height:100%;background:#0f4c81;z-index:-3}
+.heroimg img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.hero-placeholder{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:6px;color:#fff;text-align:center;background:linear-gradient(135deg,#174f7e,#2a73b8)}
+.hero-placeholder span{font:600 16px var(--hf)}
+.hero-placeholder small{font-size:12px;opacity:.8}
+.hero-overlay{position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(5,47,82,.97) 0%,rgba(8,65,108,.84) 34%,rgba(15,76,129,.48) 62%,rgba(15,76,129,.12) 100%)}
+.hero .hero-content{width:100%;display:flex;align-items:center;min-height:350px;padding-top:38px;padding-bottom:28px}
+.hero-copy{max-width:560px;color:#fff}
+.hero-kicker{display:block;letter-spacing:.22em;font-size:12px;font-weight:600;margin-bottom:8px}
+.hero h1{font-size:clamp(38px,5vw,62px);line-height:.98;max-width:530px;text-transform:uppercase}
+.hero p{font-size:15px;line-height:1.45;max-width:470px;margin:12px 0 16px}
+.hero .cta{gap:10px}
+.hero .btn{min-height:40px;padding:9px 17px;font-size:13px;border-radius:9px}
+.stats{display:flex;gap:24px;margin-top:18px}
+.stat{display:flex;align-items:center;gap:7px;min-width:90px}
+.stat-icon{width:26px;height:26px;border:1px solid rgba(255,255,255,.7);border-radius:50%;display:grid;place-items:center;font-size:13px}
+.stats b{font-size:17px;line-height:1.05}
+.stats span{font-size:11px;display:block}
+.hero-arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border:1px solid rgba(255,255,255,.7);border-radius:50%;display:grid;place-items:center;color:#fff;font-size:25px;z-index:2;background:rgba(0,0,0,.08)}
+.hero-arrow-left{left:20px}.hero-arrow-right{right:20px}
+
+/* Sambutan + Profil compact */
+.home-page .two{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:28px}
+.home-page .two h2{font-size:22px}
+.home-page .sam{grid-template-columns:140px 1fr;gap:14px}
+.home-page .sam .ph{aspect-ratio:4/5}
+.home-page .sam b{font:700 16px var(--hf)}
+.home-page .sam p{font-size:12.5px;line-height:1.5;margin:8px 0 10px}
+.home-page .sam .btn{min-height:36px;padding:7px 14px;font-size:12px}
+.home-page .prof{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:14px;align-items:start}.home-page .prof>*{min-width:0}
+.home-page .prof .ph{min-height:0;aspect-ratio:4/3;align-self:start;max-height:190px}
+.home-page .info{padding:12px 14px;border-radius:12px;font-size:11.5px;gap:5px 12px;min-width:0}
+.home-page .info dt{font-size:11.5px}
+.home-page .info dd{font-size:11.5px}
+
+/* Visi & Misi compact */
+.home-page .visi{padding:26px 0}
+.home-page .vgrid{grid-template-columns:1fr 1.25fr 2.55fr;gap:14px}
+.home-page .visi .card{padding:16px;border-radius:12px}
+.home-page .vgrid>div:first-child h2{font-size:26px}
+.home-page .vgrid>div:first-child p{font-size:12px;margin:4px 0 0;opacity:.9}
+.home-page .visi .card h3{font-size:16px}
+.home-page .misi{grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.home-page .misi div{padding:9px 6px;font-size:10.5px;border-radius:8px}
+.home-page .misi i{font-size:19px}
+
+/* News + announcements */
+.home-page .news{grid-template-columns:2.6fr 1fr;gap:24px}
+.home-page .head{margin-bottom:12px}
+.home-page .head h2{font-size:21px}
+.home-page .head p{font-size:12px}
+.home-page .ngrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.home-page .ncard{border-radius:11px}
+.home-page .ncard .ph{aspect-ratio:16/9}
+.home-page .ncard div.b{padding:10px;gap:4px}
+.home-page .ncard h3{font-size:12.5px;line-height:1.3}
+.home-page .ncard p{font-size:10.5px;line-height:1.35}
+.home-page .tag{font-size:9px;padding:2px 7px}
+.home-page .date{font-size:9.5px}
+.home-page .more{font-size:10.5px}
+.home-page .ann{gap:7px}
+.home-page .ann li{padding:10px 11px;border-radius:10px}
+.home-page .ann h3{font-size:11.5px;line-height:1.25}
+.home-page .bd{font-size:8.5px;padding:3px 7px}
+
+/* Agenda + Prestasi */
+.home-page .ag{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.home-page .ag .card{padding:10px;gap:8px;border-radius:10px;min-width:0}
+.home-page .dt{padding:6px 7px;font-size:17px;border-radius:8px}
+.home-page .dt small{font-size:9px}
+.home-page .ag h3{font-size:11px;line-height:1.25}
+.home-page .ag p{font-size:9px;line-height:1.3}
+.home-page .pg{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.home-page .pg .card{border-radius:10px}
+.home-page .pg .ph{aspect-ratio:16/9}
+.home-page .pg .b{padding:8px}
+.home-page .pg h3{font-size:11.5px}
+.home-page .pg p{font-size:9px;line-height:1.3}
+
+/* Ekstrakurikuler + Galeri */
+.home-page .ek{grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}
+.home-page .ek div{padding:10px 4px;border-radius:9px;font-size:10px}
+.home-page .ek i{font-size:22px}
+.home-page .ekskul-galeri .filt{gap:5px;margin-bottom:8px}
+.home-page .ekskul-galeri .filt button{min-height:30px;padding:4px 9px;font-size:10px}
+.home-page .gal{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.home-page .gal button{border-radius:8px}
+
+/* Digital + PPDB */
+.home-page .dig{padding:26px 0}
+.home-page .dgrid{grid-template-columns:1.5fr 1fr;gap:16px}
+.home-page .dig h2{font-size:22px}
+.home-page .dig> .wrap > div > p{font-size:11px}
+.home-page .svc{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.home-page .svc .card{padding:11px;border-radius:10px;gap:6px}
+.home-page .svc .ic{width:34px;height:34px;font-size:17px;border-radius:9px}
+.home-page .svc h3{font-size:11.5px}
+.home-page .svc p{font-size:9px;line-height:1.35}
+.home-page .svc .btn{min-height:30px;padding:6px 8px;font-size:9px}
+.home-page .ppdb{border-radius:13px;padding:18px;gap:9px}
+.home-page .ppdb h2{font-size:20px}
+.home-page .ppdb p{font-size:11px}
+.home-page .st{font-size:10px;padding:3px 9px}
+.home-page .ppdb .btn{min-height:34px;padding:7px 11px;font-size:10px}
+
+/* Contact + footer */
+.home-page .kg{grid-template-columns:1.25fr .75fr;gap:18px}
+.home-page .kc{grid-template-columns:repeat(4,1fr);gap:7px}
+.home-page .kc .card{padding:9px;font-size:10px;border-radius:9px}
+.home-page .kc b{font-size:10px}.home-page .kc span{font-size:9px}
+.home-page .map{min-height:150px;margin-top:8px;border-radius:10px}
+.home-page .soc{gap:6px}.home-page .soc .btn{min-height:32px;padding:6px 9px;font-size:9px}
+footer{padding:28px 0 14px}
+.fg{grid-template-columns:1.5fr 1fr 1fr 1fr 1.1fr;gap:16px}
+footer h3{font-size:12px;margin-bottom:7px}
+footer ul{font-size:10px;gap:3px}
+.fg p{font-size:10px!important;line-height:1.45}
+.footer-quote{display:flex;align-items:center;font-style:italic;font-size:10px;color:#fff;opacity:.9}
+.copy{margin-top:16px;padding-top:9px;font-size:10px}
+.copy small{font-size:9px}
+
+/* prevent the compact homepage styling from affecting standalone internal pages */
+.phead{padding:42px 0}
+@media(max-width:1240px){
+  .nav{height:62px}
+  nav{top:62px}
+  .nav>.btn,.search-btn{display:none}
+}
+@media(max-width:1050px){
+  .home-page .two{grid-template-columns:1fr}
+  .home-page .vgrid{grid-template-columns:1fr 1.2fr}
+  .home-page .vgrid>div:first-child{grid-column:1/-1}
+  .home-page .news{grid-template-columns:1fr}
+  .home-page .home-pair{grid-template-columns:1fr}
+  .home-page .ek{grid-template-columns:repeat(4,1fr)}
+  .home-page .gal{grid-template-columns:repeat(5,1fr)}
+  .home-page .dgrid{grid-template-columns:1fr}
+  .home-page .kg{grid-template-columns:1fr}
+  .fg{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:760px){
+  .hero{min-height:500px}
+  .hero .hero-content{min-height:500px;align-items:flex-end;padding-bottom:30px}
+  .hero-overlay{background:linear-gradient(180deg,rgba(5,47,82,.55) 0%,rgba(5,47,82,.92) 72%,rgba(5,47,82,.98) 100%)}
+  .hero h1{font-size:42px}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .home-page .two{gap:20px}
+  .home-page .sam{grid-template-columns:120px 1fr}
+  .home-page .prof{grid-template-columns:1fr}
+  .home-page .vgrid{grid-template-columns:1fr}
+  .home-page .ngrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-page .ag{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-page .pg{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-page .ek{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .home-page .gal{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .home-page .svc{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-page .kc{grid-template-columns:repeat(2,1fr)}
+  .fg{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .wrap{padding-left:14px;padding-right:14px}
+  .hero h1{font-size:36px}
+  .hero p{font-size:13px}
+  .hero-arrow{display:none}
+  .home-page .sam{grid-template-columns:1fr}
+  .home-page .sam .ph{max-width:180px}
+  .home-page .ngrid,.home-page .ag,.home-page .pg{grid-template-columns:1fr}
+  .home-page .ek{grid-template-columns:repeat(4,1fr)}
+  .home-page .gal{grid-template-columns:repeat(2,1fr)}
+  .home-page .kc{grid-template-columns:1fr}
+  .fg{grid-template-columns:1fr}
+}
+
+/* Visi & Misi — compact composition mengikuti master mockup */
+.home-page .visi .wrap{min-width:0}
+.home-page .visi-intro{padding:10px 8px 10px 0;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.home-page .visi-kicker{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:700;letter-spacing:.14em;margin-bottom:8px}
+.home-page .visi-kicker::before{content:"";width:22px;height:2px;background:var(--a);display:inline-block}
+.home-page .visi-intro h2{font-size:27px;line-height:1.05;margin:0 0 8px;color:#fff}
+.home-page .visi-intro p{font-size:11.5px;line-height:1.6;margin:0 0 11px;max-width:250px;color:rgba(255,255,255,.92)}
+.home-page .visi-link{font-size:10.5px;font-weight:700;color:#fff;display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+.home-page .visi-link:hover{text-decoration:underline}
+.home-page .visi-card,.home-page .misi-card{min-width:0;min-height:0;position:relative;overflow:hidden}
+.home-page .visi-card{padding:15px 17px 16px;display:flex;flex-direction:column;justify-content:center}
+.home-page .visi-card::after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;background:#eef5fc;right:-34px;bottom:-48px}
+.home-page .visi-number{font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--s);display:block;margin-bottom:7px}
+.home-page .visi-icon{width:36px;height:36px;border-radius:10px;background:var(--soft);color:var(--s);display:grid;place-items:center;font-size:25px;margin-bottom:8px;position:relative;z-index:1}
+.home-page .visi-card h3,.home-page .misi-card h3{font-size:17px;line-height:1.15;margin:0 0 8px;position:relative;z-index:1}
+.home-page .visi-content{font-size:11px;line-height:1.55;color:var(--mut);margin:0;position:relative;z-index:1;max-width:330px}
+.home-page .misi-card{padding:15px 17px 16px}
+.home-page .misi-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:0}
+.home-page .misi-head .visi-number{margin:0}
+.home-page .misi-status{font-size:9px;color:#64748b;background:#eef4fa;border-radius:999px;padding:5px 8px;white-space:nowrap}
+.home-page .misi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:9px}
+.home-page .misi div{min-width:0;min-height:45px;padding:7px 8px;border:1px solid #dbe5ef;background:#f8fafc;border-radius:9px;display:grid;grid-template-columns:20px 1fr;grid-template-rows:auto auto;column-gap:5px;align-items:center}
+.home-page .misi-index{grid-row:1/3;font-size:8px;color:#7c8da1;align-self:center}
+.home-page .misi i{font-style:normal;font-size:15px;line-height:1;grid-column:2}
+.home-page .misi div>span:last-child{font-size:9.5px;line-height:1.2;color:var(--t);font-weight:600;grid-column:2}
+.home-page .misi-empty{border:1px dashed #cbd8e6;background:#f8fafc;border-radius:10px;padding:13px 14px;margin-top:9px;display:flex;flex-direction:column;gap:5px}
+.home-page .misi-empty strong{font-size:11.5px;color:var(--t)}
+.home-page .misi-empty span{font-size:10.5px;line-height:1.5;color:#64748b}
+@media(max-width:1050px){
+  .home-page .vgrid{grid-template-columns:1fr 1.25fr}
+  .home-page .visi-intro{grid-column:1/-1;padding-right:0}
+  .home-page .visi-intro p{max-width:520px}
+}
+@media(max-width:760px){
+  .home-page .vgrid{grid-template-columns:1fr}
+  .home-page .visi-intro{grid-column:auto;padding-right:0}
+  .home-page .visi-intro h2{font-size:24px}
+  .home-page .misi{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:480px){
+  .home-page .misi{grid-template-columns:1fr}
+}

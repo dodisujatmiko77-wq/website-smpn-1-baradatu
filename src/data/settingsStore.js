@@ -1,0 +1,110 @@
+// Pengaturan publik yang dikelola admin: PPDB, kontak/sosial media, ekstrakurikuler.
+import { useEffect, useMemo, useState } from 'react';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { read, write } from './siteStore';
+import { ppdbData } from './ppdbData';
+import { contactData } from './contactData';
+import { extracurricularData } from './extracurricularData';
+
+const remote = () => Boolean(isSupabaseConfigured && supabase);
+const filled = (v) => typeof v === 'string' && v.trim() !== '';
+
+export async function fetchSetting(key) {
+  if (!remote()) return read(`setting_${key}`, null);
+  const { data, error } = await supabase.from('site_settings').select('value').eq('key', key).maybeSingle();
+  if (error) throw error;
+  return data ? data.value : null;
+}
+export async function saveSetting(key, value) {
+  if (!remote()) { write(`setting_${key}`, value); return; }
+  const { error } = await supabase.from('site_settings').upsert({ key, value, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
+function useSetting(key) {
+  const [value, setValue] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    const run = () => fetchSetting(key).then((x) => { if (alive) setValue(x); }).catch(() => {});
+    run();
+    window.addEventListener('smpn-site-change', run);
+    return () => { alive = false; window.removeEventListener('smpn-site-change', run); };
+  }, [key]);
+  return value;
+}
+
+export function usePpdb() {
+  const s = useSetting('ppdb');
+  return useMemo(() => ({
+    ...ppdbData, ...(s || {}),
+    dibuka: s ? !!s.dibuka : ppdbData.dibuka,
+    url: (s && s.url) || ppdbData.url,
+    infoUrl: (s && s.infoUrl) || ppdbData.infoUrl,
+  }), [s]);
+}
+
+function waLink(n) {
+  const d = String(n || '').replace(/\D/g, '');
+  if (!d) return '';
+  return `https://wa.me/${d.startsWith('0') ? `62${d.slice(1)}` : d}`;
+}
+const httpOnly = (u) => (filled(u) && /^https?:\/\//i.test(u.trim()) ? u.trim() : '');
+export const MAPS_EMBED_PREFIX = 'https://www.google.com/maps/embed';
+const SOCIAL = [['Facebook', 'facebook'], ['Instagram', 'instagram'], ['YouTube', 'youtube'], ['TikTok', 'tiktok']];
+
+export function useContact() {
+  const s = useSetting('contact');
+  return useMemo(() => {
+    if (!s) return { ...contactData, embed: '' };
+    return {
+      ...contactData,
+      jam: filled(s.jam) ? s.jam.trim() : contactData.jam,
+      wa: waLink(s.wa), maps: httpOnly(s.maps),
+      embed: filled(s.mapsEmbed) && s.mapsEmbed.trim().startsWith(MAPS_EMBED_PREFIX) ? s.mapsEmbed.trim() : '',
+      sosmed: SOCIAL.filter(([, k]) => httpOnly(s[k])).map(([n, k]) => [n, httpOnly(s[k])]),
+    };
+  }, [s]);
+}
+
+// --- Ekstrakurikuler ---
+export async function fetchExtras() {
+  if (!remote()) return read('extracurriculars', []);
+  const { data, error } = await supabase.from('extracurriculars').select('*').order('sort_order').order('name');
+  if (error) throw error;
+  return data || [];
+}
+export async function saveExtra(item) {
+  const payload = { name: (item.name || '').trim(), icon: item.icon || null, description: item.description || null, coach: item.coach || null,
+    schedule: item.schedule || null, active: item.active !== false, sort_order: Number(item.sort_order || 0) };
+  if (!payload.name) throw new Error('Nama kegiatan wajib diisi.');
+  if (!remote()) {
+    const items = read('extracurriculars', []);
+    const row = { ...payload, id: item.id || String(Date.now()) };
+    write('extracurriculars', item.id ? items.map((x) => (x.id === item.id ? row : x)) : [...items, row]);
+    return row;
+  }
+  if (item.id) payload.id = item.id;
+  payload.updated_at = new Date().toISOString();
+  const { data, error } = await supabase.from('extracurriculars').upsert(payload).select('*').single();
+  if (error) throw error;
+  return data;
+}
+export async function deleteExtra(id) {
+  if (!remote()) { write('extracurriculars', read('extracurriculars', []).filter((x) => x.id !== id)); return; }
+  const { error } = await supabase.from('extracurriculars').delete().eq('id', id);
+  if (error) throw error;
+}
+
+export function useExtracurriculars() {
+  const [rows, setRows] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetchExtras().then((d) => { if (alive) setRows(d); }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return useMemo(() => {
+    const act = (rows || []).filter((r) => r.active !== false);
+    if (act.length) return act.map((r) => ({ id: r.id, ikon: r.icon || '⭐', nama: r.name, deskripsi: r.description || '', pembina: r.coach || '', jadwal: r.schedule || '' }));
+    return extracurricularData.map(([ikon, nama]) => ({ id: nama, ikon, nama, deskripsi: '', pembina: '', jadwal: '' }));
+  }, [rows]);
+}

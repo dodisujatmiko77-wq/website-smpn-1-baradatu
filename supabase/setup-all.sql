@@ -350,24 +350,66 @@ drop policy if exists "site admin manage staff" on public.staff;
 create policy "site admin manage staff" on public.staff for all to authenticated
   using (public.is_site_admin()) with check (public.is_site_admin());
 
--- View publik: hanya baris published, dan kolom hanya terisi bila dicentang "tampilkan" oleh admin.
-create or replace view public.staff_public as
-select id, kind, name, sort_order,
-  case when 'position' = any(visible_fields) then position end as position,
-  case when 'subject'  = any(visible_fields) then subject end as subject,
-  case when 'nip'      = any(visible_fields) then nip end as nip,
-  case when 'nuptk'    = any(visible_fields) then nuptk end as nuptk,
-  case when 'gender'   = any(visible_fields) then gender end as gender,
-  case when 'birth'    = any(visible_fields) then birth_place end as birth_place,
-  case when 'birth'    = any(visible_fields) then birth_date end as birth_date,
-  case when 'status'   = any(visible_fields) then employment_status end as employment_status,
-  case when 'education'= any(visible_fields) then education end as education,
-  case when 'email'    = any(visible_fields) then email end as email,
-  case when 'phone'    = any(visible_fields) then phone end as phone,
-  case when 'photo'    = any(visible_fields) then photo_url end as photo_url,
-  case when 'bio'      = any(visible_fields) then bio end as bio
-from public.staff where status = 'published';
+-- Data publik GTK: tabel `staff_public` berisi HANYA baris terbit dan kolom yang dicentang "tampilkan".
+-- Diisi otomatis oleh trigger setiap kali tabel `staff` berubah (tanpa view SECURITY DEFINER).
+do $$ begin
+  if exists (select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace
+             where n.nspname = 'public' and c.relname = 'staff_public' and c.relkind = 'v') then
+    drop view public.staff_public;
+  end if;
+end $$;
+
+create table if not exists public.staff_public (
+  id uuid primary key references public.staff(id) on delete cascade,
+  kind text not null, name text not null, sort_order int not null default 0,
+  position text, subject text, nip text, nuptk text, gender text, birth_place text, birth_date date,
+  employment_status text, education text, email text, phone text, photo_url text, bio text
+);
+alter table public.staff_public enable row level security;
+drop policy if exists "public read staff public" on public.staff_public;
+create policy "public read staff public" on public.staff_public for select to anon, authenticated using (true);
+revoke insert, update, delete on public.staff_public from anon, authenticated;
 grant select on public.staff_public to anon, authenticated;
+
+create or replace function public.sync_staff_public()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare r public.staff;
+begin
+  if tg_op = 'DELETE' then
+    delete from public.staff_public where id = old.id;
+    return old;
+  end if;
+  r := new;
+  delete from public.staff_public where id = r.id;
+  if r.status = 'published' then
+    insert into public.staff_public (id, kind, name, sort_order, position, subject, nip, nuptk, gender, birth_place, birth_date,
+      employment_status, education, email, phone, photo_url, bio)
+    values (r.id, r.kind, r.name, r.sort_order,
+      case when 'position'  = any(r.visible_fields) then r.position end,
+      case when 'subject'   = any(r.visible_fields) then r.subject end,
+      case when 'nip'       = any(r.visible_fields) then r.nip end,
+      case when 'nuptk'     = any(r.visible_fields) then r.nuptk end,
+      case when 'gender'    = any(r.visible_fields) then r.gender end,
+      case when 'birth'     = any(r.visible_fields) then r.birth_place end,
+      case when 'birth'     = any(r.visible_fields) then r.birth_date end,
+      case when 'status'    = any(r.visible_fields) then r.employment_status end,
+      case when 'education' = any(r.visible_fields) then r.education end,
+      case when 'email'     = any(r.visible_fields) then r.email end,
+      case when 'phone'     = any(r.visible_fields) then r.phone end,
+      case when 'photo'     = any(r.visible_fields) then r.photo_url end,
+      case when 'bio'       = any(r.visible_fields) then r.bio end);
+  end if;
+  return new;
+end $$;
+-- Fungsi trigger tidak boleh dipanggil langsung lewat API
+revoke execute on function public.sync_staff_public() from public, anon, authenticated;
+
+drop trigger if exists staff_sync_public on public.staff;
+create trigger staff_sync_public after insert or update or delete on public.staff
+  for each row execute function public.sync_staff_public();
+
+-- Isi ulang dari data yang sudah ada (aman dijalankan berkali-kali)
+update public.staff set id = id;
 
 -- >>>>> pengaturan.sql
 -- ========== PENGATURAN PPDB, KONTAK, EKSTRAKURIKULER ==========

@@ -48,3 +48,8 @@
 .users-pending td{background:#fffbeb}
 .table-card select{padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;font-size:12px;background:#fff}
 @media(max-width:800px){.users-roles{grid-template-columns:1fr}}
+
+/* Input file tersembunyi tidak boleh ikut tampil karena aturan .form-grid input{display:block} */
+.admin-shell [hidden],.image-field input[type=file]{display:none!important}
+.image-field-controls input{margin-top:0}
+.image-field-buttons .mini-btn{margin-right:0}

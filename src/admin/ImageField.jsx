@@ -25,7 +25,7 @@ export default function ImageField({ label, value, onChange, folder = 'umum', wi
             <button type="button" className="mini-btn" onClick={() => fileRef.current && fileRef.current.click()} disabled={busy}>{busy ? 'Mengunggah…' : 'Unggah Foto'}</button>
             {value && <button type="button" className="mini-btn danger" onClick={() => onChange('')} disabled={busy}>Hapus</button>}
           </div>
-          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={pick} />
+          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden tabIndex={-1} aria-hidden="true" onChange={pick} />
         </div>
       </div>
       <small className="image-field-hint">JPG/PNG/WEBP, maks. 5 MB. Disarankan lebar ±1600px.</small>

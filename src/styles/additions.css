@@ -95,3 +95,51 @@
   .hero .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .hero .stat{padding:8px 12px 8px 8px}.hero .stats .stat-icon{width:36px;height:36px}.hero .stats b{font-size:21px}
 }
+
+/* ===== Beranda: Visi & Misi ===== */
+.home-page .visi{position:relative;overflow:hidden;padding:44px 0}
+.home-page .visi::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.09) 1.2px,transparent 1.2px);background-size:22px 22px;pointer-events:none}
+.home-page .visi::after{content:"";position:absolute;width:420px;height:420px;right:-140px;top:-160px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.18),transparent 70%);pointer-events:none}
+.home-page .vgrid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(220px,1fr) 2.7fr;gap:28px;align-items:center}
+.vm-intro{color:#fff}
+.vm-kicker{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.16em;opacity:.9}
+.vm-kicker::before{content:"";width:24px;height:2px;background:#fbbf24}
+.vm-intro h2{font:800 34px/1.05 var(--hf);color:#fff;margin:10px 0 10px}
+.vm-intro p{font-size:13.5px;line-height:1.65;color:rgba(255,255,255,.88);margin:0 0 16px;max-width:300px}
+.vm-motto{display:flex;gap:6px;margin-bottom:18px}
+.vm-motto span{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font:800 15px var(--hf);color:#3b2300;background:linear-gradient(135deg,#fde68a,#f59e0b);box-shadow:0 4px 12px rgba(245,158,11,.3)}
+.vm-link{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.45);color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:background .2s,color .2s}
+.vm-link:hover{background:#fff;color:var(--p)}
+
+.vm-body{display:grid;grid-template-columns:1fr 1.45fr;gap:16px;align-items:stretch;min-width:0}
+.vm-visi,.vm-misi{position:relative;border-radius:20px;padding:22px 24px;min-width:0}
+.vm-label{display:inline-flex;align-items:center;gap:10px;font:800 12px var(--hf);letter-spacing:.18em}
+.vm-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center}
+
+.vm-visi{background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;display:flex;flex-direction:column;overflow:hidden}
+.vm-visi .vm-badge{background:linear-gradient(135deg,#fde68a,#f59e0b);color:#3b2300}
+.vm-visi::after{content:"\201D";position:absolute;right:14px;bottom:-46px;font:800 170px/1 Georgia,serif;color:rgba(255,255,255,.1);pointer-events:none}
+.vm-visi blockquote{margin:16px 0 0;font:600 19px/1.5 var(--hf);position:relative;z-index:1}
+.vm-visi.is-empty blockquote{font:italic 500 14px/1.6 var(--bf);opacity:.8}
+
+.vm-misi{background:#fff;color:var(--t);box-shadow:0 18px 40px rgba(4,25,52,.22)}
+.vm-misi .vm-label{color:var(--p)}
+.vm-misi .vm-badge{background:#e8f1fb;color:var(--p)}
+.vm-misi-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.vm-count{font-size:11px;font-weight:700;color:#b45309;background:#fef3c7;border-radius:999px;padding:5px 10px}
+.vm-list{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;counter-reset:none}
+.vm-list li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:#f6f9fc;border:1px solid #e6edf5;font-size:13px;line-height:1.5;transition:border-color .2s,transform .2s}
+.vm-list li:hover{border-color:#bcd3ea;transform:translateY(-1px)}
+.vm-num{flex:none;min-width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font:800 12px var(--hf);color:#fff;background:linear-gradient(135deg,#1976d2,#0f4c81)}
+.vm-list li>span:last-child{padding-top:4px}
+.vm-empty{margin:14px 0 0;padding:16px;border:1px dashed #cbd8e6;border-radius:12px;background:#f8fafc;color:#64748b;font-size:13px;line-height:1.6}
+
+@media(max-width:1050px){.home-page .vgrid{grid-template-columns:1fr}.vm-intro p{max-width:560px}}
+@media(max-width:760px){.vm-body{grid-template-columns:1fr}.vm-list{grid-template-columns:1fr}.vm-intro h2{font-size:28px}.vm-visi blockquote{font-size:17px}.home-page .visi{padding:34px 0}}
+/* aturan lama .home-page .vgrid>div:first-child * lebih spesifik; ditimpa di sini */
+.home-page .vgrid>div.vm-intro h2{font:800 34px/1.05 var(--hf);margin:10px 0 10px}
+.home-page .vgrid>div.vm-intro p{font-size:13.5px;line-height:1.65;margin:0 0 16px;opacity:1}
+.vm-visi{justify-content:center}
+.vm-visi .vm-label{position:absolute;top:22px;left:24px}
+.vm-visi blockquote{margin:44px 0 8px}
+@media(max-width:760px){.home-page .vgrid>div.vm-intro h2{font-size:28px}}

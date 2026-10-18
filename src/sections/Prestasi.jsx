@@ -1,4 +1,5 @@
 import Card from "../components/Card";
+import EmptyState from "../components/EmptyState";
 import Photo from "../components/Photo";
 import SectionHead from "../components/SectionHead";
 import { usePublicList } from "../data/publicData";
@@ -13,7 +14,7 @@ export default function Prestasi({ bare, home = true }) {
             <div className="b"><h3>{a.nama}</h3><p>{a.siswa}{a.siswa && <br />}{[a.tingkat && `Tingkat ${a.tingkat}`, a.tahun].filter(Boolean).join(" • ")}</p></div></Card>
         ))}
       </div>
-      {!loading && !items.length && home && <p className="home-empty">Belum ada prestasi yang diterbitkan.</p>}
+      {!loading && !items.length && home && <EmptyState icon="🏆" tone="gold" title="Belum ada prestasi" text="Prestasi peserta didik dan sekolah akan tampil di sini." />}
     </div>
   );
 }

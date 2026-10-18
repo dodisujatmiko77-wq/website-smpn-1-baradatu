@@ -1,4 +1,5 @@
 import { useState } from "react";
+import EmptyState from "../components/EmptyState";
 import Photo from "../components/Photo";
 import Lightbox from "../components/Lightbox";
 import SectionHead from "../components/SectionHead";
@@ -19,7 +20,7 @@ export default function Galeri({ bare, home = true }) {
           <button key={g.id || i} aria-label={`Buka ${g.judul}`} onClick={() => setSel(g)}><Photo src={g.foto} alt={g.judul} /></button>
         ))}
       </div>
-      {!loading && !shown.length && <p className="home-empty">Belum ada foto{cur !== "Semua" ? ` untuk kategori ${cur}` : ""}.</p>}
+      {!loading && !shown.length && <EmptyState icon="🖼️" tone="green" title={`Belum ada foto${cur !== "Semua" ? ` ${cur}` : ""}`} text="Dokumentasi kegiatan sekolah akan tampil di sini." />}
       <Lightbox item={sel} onClose={() => setSel(null)} />
     </div>
   );

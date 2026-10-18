@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import EmptyState from "../components/EmptyState";
 import Card from "../components/Card";
 import Badge from "../components/Badge";
 import SectionHead from "../components/SectionHead";
@@ -16,7 +17,7 @@ export default function Pengumuman({ bare }) {
           </Card>
         ))}
       </ul>
-      {!loading && !items.length && <p className="home-empty">Belum ada pengumuman.</p>}
+      {!loading && !items.length && <EmptyState icon="📢" tone="orange" title="Belum ada pengumuman" text="Pengumuman resmi akan tampil di sini." />}
     </div>
   );
 }

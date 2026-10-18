@@ -3,7 +3,7 @@ export default function SectionHead({ title, sub, to, label = "Lihat Semua", sty
   return (
     <div className="head" style={style}>
       <div><h2>{title}</h2>{sub && <p>{sub}</p>}</div>
-      {to && <Link className="more" to={to}>{label}</Link>}
+      {to && <Link className="more" to={to}>{label} <span aria-hidden="true">→</span></Link>}
     </div>
   );
 }

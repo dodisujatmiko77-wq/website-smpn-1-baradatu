@@ -1,4 +1,5 @@
 import Card from "../components/Card";
+import EmptyState from "../components/EmptyState";
 import SectionHead from "../components/SectionHead";
 import { usePublicList } from "../data/publicData";
 export default function Agenda({ bare }) {
@@ -12,7 +13,7 @@ export default function Agenda({ bare }) {
             <div><h3>{a.nama}</h3><p>{a.jam && <>🕗 {a.jam}<br /></>}{a.lokasi && <>📍 {a.lokasi}</>}</p></div></Card>
         ))}
       </div>
-      {!loading && !items.length && <p className="home-empty">Belum ada agenda terdekat.</p>}
+      {!loading && !items.length && <EmptyState icon="📅" tone="purple" title="Belum ada agenda terdekat" text="Jadwal kegiatan sekolah akan tampil di sini." />}
     </div>
   );
 }

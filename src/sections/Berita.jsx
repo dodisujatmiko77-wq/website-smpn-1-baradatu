@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import EmptyState from "../components/EmptyState";
 import Card from "../components/Card";
 import Badge from "../components/Badge";
 import Photo from "../components/Photo";
@@ -21,7 +22,7 @@ export default function Berita({ bare }) {
           );
         })}
       </div>
-      {!loading && !items.length && <p className="home-empty">Belum ada berita yang diterbitkan.</p>}
+      {!loading && !items.length && <EmptyState icon="📰" title="Belum ada berita" text="Berita dan kegiatan terbaru sekolah akan tampil di sini." />}
     </div>
   );
 }

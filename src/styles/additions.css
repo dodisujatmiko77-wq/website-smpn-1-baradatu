@@ -143,3 +143,42 @@
 .vm-visi .vm-label{position:absolute;top:22px;left:24px}
 .vm-visi blockquote{margin:44px 0 8px}
 @media(max-width:760px){.home-page .vgrid>div.vm-intro h2{font-size:28px}}
+
+/* ===== Beranda: judul bagian, tampilan kosong, ekstrakurikuler ===== */
+.home-page .head h2{position:relative;padding-left:14px}
+.home-page .head h2::before{content:"";position:absolute;left:0;top:.18em;bottom:.18em;width:4px;border-radius:4px;background:linear-gradient(180deg,#fbbf24,#f59e0b)}
+.home-page .head p{padding-left:14px}
+.home-page .head .more{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;background:#eaf2fb;color:var(--s);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background .2s,color .2s}
+.home-page .head .more:hover{background:var(--s);color:#fff}
+
+.empty-state{--tone:#1976d2;display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--tone) 7%,white),#fff 70%);border:1px solid color-mix(in srgb,var(--tone) 16%,white);position:relative;overflow:hidden}
+.empty-state::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:color-mix(in srgb,var(--tone) 8%,transparent)}
+.empty-state-icon{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:#fff;box-shadow:0 6px 16px color-mix(in srgb,var(--tone) 22%,transparent)}
+.empty-state strong{display:block;font:700 15px var(--hf);color:var(--t)}
+.empty-state p{margin:3px 0 0;font-size:13px;color:var(--mut);line-height:1.5}
+.empty-state.tone-orange{--tone:#f97316}.empty-state.tone-purple{--tone:#7c3aed}.empty-state.tone-gold{--tone:#d97706}.empty-state.tone-green{--tone:#16a34a}
+
+.home-page .ek{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.ek .ek-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px 12px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 4px 14px rgba(15,76,129,.06);color:var(--t);text-decoration:none;text-align:center;transition:transform .2s,box-shadow .2s,border-color .2s}
+.ek .ek-item:hover{transform:translateY(-3px);border-color:#bcd3ea;box-shadow:0 10px 22px rgba(15,76,129,.12)}
+.ek .ek-item i{font-style:normal;font-size:24px;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#eef5fd,#dbeafe)}
+.ek .ek-item span{font-size:12px;font-weight:700;line-height:1.3}
+
+/* ===== Footer: kredit pengembang ===== */
+.dev-credit{margin-top:28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 20px;border-radius:18px;background:linear-gradient(120deg,#081226,#0b2547 60%,#0d3a70);border:1px solid rgba(56,189,248,.25);box-shadow:0 10px 30px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.06)}
+.dev-credit img{width:56px;height:56px;border-radius:14px;flex:none;box-shadow:0 0 18px rgba(56,189,248,.35)}
+.dev-credit-main{flex:1;min-width:200px}
+.dev-credit-main small{display:block;font-size:11px;color:#93c5fd;letter-spacing:.06em}
+.dev-credit-main strong{display:block;font:700 17px var(--hf);color:#fff;margin:2px 0}
+.dev-credit-main strong>span{color:#38bdf8;margin:0 4px}
+.dev-credit-main em{font-style:normal;letter-spacing:.06em;color:#e0f2fe}
+.dev-credit-main em b{color:#38bdf8}
+.dev-credit-tag{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7dd3fc;opacity:.85}
+.dev-credit-links{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.dev-credit-links a{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.28);color:#e0f2fe;font-size:12px;font-weight:600;text-decoration:none;transition:background .2s}
+.dev-credit-links a:hover{background:rgba(56,189,248,.28);color:#fff}
+.copy{margin-top:16px}
+@media(max-width:760px){.dev-credit{padding:14px}.dev-credit-links{width:100%}}
+.home-page .head{flex-wrap:nowrap;align-items:flex-end}
+.home-page .head>div{min-width:0}
+.home-page .head .more{flex:none}

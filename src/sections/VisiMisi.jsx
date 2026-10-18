@@ -1,10 +1,11 @@
 import Card from "../components/Card";
-import { schoolData as s } from "../data/schoolData";
-
-const isPlaceholderVisi = !s.visi || /^\[.*\]$/.test(s.visi.trim());
-const hasOfficialMisi = Array.isArray(s.misi) && s.misi.length > 0 && s.misi.some(([, text]) => text && !/^\[.*\]$/.test(text.trim()));
+import { Link } from "react-router-dom";
+import { useVisionMission } from "../data/publicData";
 
 export default function VisiMisi() {
+  const s = useVisionMission();
+  const isPlaceholderVisi = !s.visi;
+  const hasOfficialMisi = s.misi.length > 0;
   return (
     <>
       <div className="visi-intro">
@@ -14,7 +15,7 @@ export default function VisiMisi() {
           Landasan dan arah pengembangan UPT SMPN 1 Baradatu dalam membangun
           peserta didik yang berkarakter, berprestasi, dan adaptif.
         </p>
-        <a className="visi-link" href="/profil/visi-misi">Lihat selengkapnya <span aria-hidden="true">→</span></a>
+        <Link className="visi-link" to="/profil/visi-misi">Lihat selengkapnya <span aria-hidden="true">→</span></Link>
       </div>
 
       <Card className="visi-card">

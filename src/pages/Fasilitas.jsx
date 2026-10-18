@@ -1,4 +1,7 @@
+import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
+import Photo from "../components/Photo";
+import { usePublicList } from "../data/publicData";
 
 const facilities = [
   { icon: "🏫", title: "Ruang Kelas", desc: "Data ruang kelas dan fasilitas pembelajaran di dalamnya." },
@@ -12,10 +15,12 @@ const facilities = [
 ];
 
 export default function FasilitasPage() {
+  const { items: list } = usePublicList("facilities");
+  const has = list.length > 0;
   return (
     <PageShell title="Fasilitas Sekolah" sub="Sarana dan prasarana UPT SMPN 1 Baradatu">
       <div className="page-breadcrumb">
-        <a href="/">Beranda</a><span>›</span><a href="/profil">Profil</a><span>›</span><strong>Fasilitas Sekolah</strong>
+        <Link to="/">Beranda</Link><span>›</span><Link to="/profil">Profil</Link><span>›</span><strong>Fasilitas Sekolah</strong>
       </div>
 
       <div className="facility-intro">
@@ -29,10 +34,17 @@ export default function FasilitasPage() {
         </div>
         <div className="facility-status">
           <span className="status-dot" />
-          <div>
-            <strong>Data fasilitas siap dilengkapi</strong>
-            <span>Data resmi akan dimasukkan oleh admin/operator sekolah.</span>
-          </div>
+          {has ? (
+            <div>
+              <strong>{list.length} fasilitas</strong>
+              <span>Sarana dan prasarana sekolah.</span>
+            </div>
+          ) : (
+            <div>
+              <strong>Data fasilitas siap dilengkapi</strong>
+              <span>Data resmi akan dimasukkan oleh admin/operator sekolah.</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -46,7 +58,15 @@ export default function FasilitasPage() {
         </div>
 
         <div className="facility-grid">
-          {facilities.map((item) => (
+          {has ? list.map((item) => (
+            <article className="facility-card facility-card-official" key={item.id}>
+              {item.foto ? <Photo className="facility-photo" src={item.foto} alt={item.nama} /> : <div className="facility-icon" aria-hidden="true">🏫</div>}
+              <div>
+                <h3>{item.nama}</h3>
+                {item.deskripsi && <p>{item.deskripsi}</p>}
+              </div>
+            </article>
+          )) : facilities.map((item) => (
             <article className="facility-card" key={item.title}>
               <div className="facility-icon" aria-hidden="true">{item.icon}</div>
               <div>
@@ -59,7 +79,7 @@ export default function FasilitasPage() {
         </div>
       </section>
 
-      <div className="facility-note">
+      {!has && <div className="facility-note">
         <div className="facility-note-icon">i</div>
         <div>
           <h3>Catatan Informasi</h3>
@@ -69,7 +89,7 @@ export default function FasilitasPage() {
             sekolah tersedia.
           </p>
         </div>
-      </div>
+      </div>}
     </PageShell>
   );
 }

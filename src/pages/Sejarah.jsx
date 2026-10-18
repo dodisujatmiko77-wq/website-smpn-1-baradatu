@@ -1,6 +1,10 @@
+import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
+import { useHistory } from "../data/publicData";
 
 export default function SejarahPage() {
+  const h = useHistory();
+  const has = h.paragraphs.length > 0;
   return (
     <PageShell
       title="Sejarah Sekolah"
@@ -8,9 +12,9 @@ export default function SejarahPage() {
     >
       <div className="history-page">
         <div className="breadcrumb" aria-label="Breadcrumb">
-          <a href="/">Beranda</a>
+          <Link to="/">Beranda</Link>
           <span aria-hidden="true">›</span>
-          <a href="/profil">Profil</a>
+          <Link to="/profil">Profil</Link>
           <span aria-hidden="true">›</span>
           <span>Sejarah</span>
         </div>
@@ -21,12 +25,17 @@ export default function SejarahPage() {
             <span className="eyebrow">SEJARAH SEKOLAH</span>
             <h2>Perjalanan UPT SMPN 1 Baradatu</h2>
             <p>
-              Informasi mengenai sejarah berdiri dan perkembangan sekolah akan
-              ditampilkan setelah data resmi sekolah tersedia.
+              {has ? "Sejarah berdiri dan perkembangan UPT SMPN 1 Baradatu." : "Informasi mengenai sejarah berdiri dan perkembangan sekolah akan ditampilkan setelah data resmi sekolah tersedia."}
             </p>
           </div>
         </section>
 
+        {has ? (
+          <section className="history-content card">
+            <h2>{h.title}</h2>
+            {h.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+          </section>
+        ) : <>
         <section className="history-empty card">
           <div className="history-empty-icon" aria-hidden="true">◷</div>
           <div>
@@ -55,6 +64,7 @@ export default function SejarahPage() {
             <p>Dokumentasi dan foto bersejarah sekolah dapat ditambahkan pada tahap pengisian data.</p>
           </article>
         </div>
+        </>}
       </div>
     </PageShell>
   );

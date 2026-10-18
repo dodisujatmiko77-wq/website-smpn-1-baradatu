@@ -1,17 +1,17 @@
+import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
-import { schoolData as s } from "../data/schoolData";
-
-const isPlaceholderVisi = !s.visi || /^\[.*\]$/.test(s.visi.trim());
-const officialMisi = Array.isArray(s.misi)
-  ? s.misi.filter((item) => Array.isArray(item) && item[1] && !/^\[.*\]$/.test(item[1].trim()))
-  : [];
+import { useVisionMission } from "../data/publicData";
 
 export default function VisiMisiPage() {
+  const s = useVisionMission();
+  const isPlaceholderVisi = !s.visi;
+  const officialMisi = s.misi;
+  const ready = !isPlaceholderVisi || officialMisi.length > 0;
   return (
     <PageShell title="Visi & Misi" sub="Arah, tujuan, dan nilai pengembangan UPT SMPN 1 Baradatu">
       <div className="visi-detail-page">
         <div className="page-breadcrumb">
-          <a href="/">Beranda</a><span>›</span><a href="/profil">Profil</a><span>›</span><strong>Visi &amp; Misi</strong>
+          <Link to="/">Beranda</Link><span>›</span><Link to="/profil">Profil</Link><span>›</span><strong>Visi &amp; Misi</strong>
         </div>
 
         <section className="visi-detail-hero">
@@ -25,10 +25,17 @@ export default function VisiMisiPage() {
           </div>
           <div className="visi-detail-status">
             <span className="status-dot" />
-            <div>
-              <strong>Data resmi siap dilengkapi</strong>
-              <span>Visi dan misi akan ditampilkan sesuai dokumen resmi sekolah.</span>
-            </div>
+            {ready ? (
+              <div>
+                <strong>Data resmi sekolah</strong>
+                <span>Visi dan misi UPT SMPN 1 Baradatu.</span>
+              </div>
+            ) : (
+              <div>
+                <strong>Data resmi siap dilengkapi</strong>
+                <span>Visi dan misi akan ditampilkan sesuai dokumen resmi sekolah.</span>
+              </div>
+            )}
           </div>
         </section>
 
@@ -75,7 +82,7 @@ export default function VisiMisiPage() {
           </article>
         </section>
 
-        <section className="visi-detail-note">
+        {!ready && <section className="visi-detail-note">
           <div className="visi-detail-note-icon">i</div>
           <div>
             <h3>Catatan Informasi</h3>
@@ -84,7 +91,7 @@ export default function VisiMisiPage() {
               sekolah dan dapat diperbarui oleh admin/operator ketika data telah tersedia.
             </p>
           </div>
-        </section>
+        </section>}
       </div>
     </PageShell>
   );

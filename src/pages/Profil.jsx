@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import Photo from "../components/Photo";
-import { schoolData as s } from "../data/schoolData";
+import { isPlaceholder, useHistory, useSchoolData } from "../data/publicData";
 
 const rows = [
   ["NPSN", "npsn"],
@@ -15,6 +15,9 @@ const rows = [
 ];
 
 export default function ProfilPage() {
+  const s = useSchoolData();
+  const history = useHistory();
+  const complete = rows.every(([, k]) => !isPlaceholder(String(s[k] || "")));
   return (
     <PageShell
       title="Profil Sekolah"
@@ -29,7 +32,7 @@ export default function ProfilPage() {
 
         <div className="profile-overview">
           <div className="profile-photo-card card">
-            <Photo src={s.schoolImage} alt="Foto UPT SMPN 1 Baradatu" />
+            <Photo src={s.schoolImage} alt={`Foto ${s.name}`} />
             <div className="profile-photo-caption">
               <strong>UPT SMPN 1 Baradatu</strong>
               <span>Foto dan identitas sekolah</span>
@@ -42,13 +45,13 @@ export default function ProfilPage() {
                 <span className="eyebrow">IDENTITAS SEKOLAH</span>
                 <h2>Data Sekolah</h2>
               </div>
-              <span className="data-status">Data belum lengkap</span>
+              <span className="data-status">{complete ? "Data resmi" : "Data belum lengkap"}</span>
             </div>
             <dl className="profile-info-list">
               {rows.map(([label, key]) => (
                 <div className="profile-info-row" key={key}>
                   <dt>{label}</dt>
-                  <dd>{s[key] || "Belum diisi"}</dd>
+                  <dd>{isPlaceholder(String(s[key] || "")) ? "Belum diisi" : s[key]}</dd>
                 </div>
               ))}
             </dl>
@@ -60,22 +63,33 @@ export default function ProfilPage() {
             <span className="eyebrow">TENTANG SEKOLAH</span>
             <h2>Profil UPT SMPN 1 Baradatu</h2>
           </div>
-          <div className="profile-empty">
+          {history.paragraphs.length ? (
+            <div className="profile-about-text">
+              {history.paragraphs.slice(0, 2).map((p, i) => <p key={i}>{p}</p>)}
+              <Link className="more" to="/profil/sejarah">Baca sejarah sekolah</Link>
+            </div>
+          ) : <div className="profile-empty">
             <strong>Profil resmi sekolah belum tersedia.</strong>
             <p>Informasi tentang sejarah singkat, karakteristik, dan profil sekolah akan ditampilkan setelah admin/operator memasukkan data resmi sekolah.</p>
-          </div>
+          </div>}
         </section>
 
         <div className="profile-highlights">
           <section className="profile-highlight card">
             <span className="eyebrow">SEKILAS SEKOLAH</span>
             <h2>Informasi Singkat</h2>
-            <p>Ringkasan mengenai identitas dan gambaran umum sekolah akan tersedia setelah data resmi dimasukkan.</p>
+            {complete ? (
+              <p>{s.name} adalah sekolah menengah pertama negeri di Kecamatan {s.kecamatan}, Kabupaten {s.kabupaten}, Provinsi {s.provinsi}.{s.akreditasi ? ` Terakreditasi ${s.akreditasi}.` : ""}</p>
+            ) : (
+              <p>Ringkasan mengenai identitas dan gambaran umum sekolah akan tersedia setelah data resmi dimasukkan.</p>
+            )}
           </section>
           <section className="profile-highlight card">
             <span className="eyebrow">INFORMASI PENTING</span>
-            <h2>Data Resmi Sekolah</h2>
-            <p>Data resmi sekolah akan dikelola dan diperbarui oleh admin/operator pada tahap pengisian konten.</p>
+            <h2>Jelajahi Profil</h2>
+            <p className="profile-links">
+              <Link to="/profil/visi-misi">Visi &amp; Misi</Link> · <Link to="/profil/sejarah">Sejarah</Link> · <Link to="/profil/struktur">Struktur Organisasi</Link> · <Link to="/profil/fasilitas">Fasilitas</Link> · <Link to="/gtk/guru">Guru</Link>
+            </p>
           </section>
         </div>
       </div>

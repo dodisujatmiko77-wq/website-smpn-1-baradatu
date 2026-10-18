@@ -189,14 +189,16 @@ drop policy if exists "site manager upload media" on storage.objects;
 drop policy if exists "site manager update media" on storage.objects;
 drop policy if exists "site manager delete media" on storage.objects;
 create policy "public read site media" on storage.objects for select to anon, authenticated using (bucket_id = 'site-media');
-create policy "site manager upload media" on storage.objects for insert to authenticated with check (bucket_id = 'site-media' and public.is_site_manager());
+-- Editor juga boleh mengunggah foto (untuk berita, galeri, dll.). Hapus file tetap khusus admin.
+create policy "site manager upload media" on storage.objects for insert to authenticated with check (bucket_id = 'site-media' and public.is_site_admin());
 create policy "site manager update media" on storage.objects for update to authenticated using (bucket_id = 'site-media' and public.is_site_manager()) with check (bucket_id = 'site-media' and public.is_site_manager());
 create policy "site manager delete media" on storage.objects for delete to authenticated using (bucket_id = 'site-media' and public.is_site_manager());
 
 -- Initial website settings. Safe placeholders; replace from Admin Panel after deployment.
+-- Hanya dibuat jika tabel masih kosong (tabel ini tidak punya kunci unik selain id acak).
 insert into public.school_settings (name, npsn, kecamatan, kabupaten, provinsi)
-values ('UPT SMPN 1 BARADATU', '[NPSN]', 'Baradatu', 'Way Kanan', 'Lampung')
-on conflict do nothing;
+select 'UPT SMPN 1 BARADATU', '[NPSN]', 'Baradatu', 'Way Kanan', 'Lampung'
+where not exists (select 1 from public.school_settings);
 
 insert into public.homepage_sections (section_key, visible, sort_order) values
 ('hero',true,1),('sambutan',true,2),('profil',true,3),('visiMisi',true,4),('berita',true,5),

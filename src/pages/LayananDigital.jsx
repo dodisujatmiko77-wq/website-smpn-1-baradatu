@@ -1,6 +1,5 @@
 import PageShell from "../components/PageShell";
-import { digitalServices } from "../data/digitalServices";
-import { useSiteValue } from "../data/siteStore";
+import { usePublicList } from "../data/publicData";
 
 const groups = [
   ["01", "Layanan Utama", "Akses sistem digital sekolah yang digunakan untuk mendukung layanan dan pengelolaan sekolah."],
@@ -8,7 +7,7 @@ const groups = [
 ];
 
 export default function LayananDigitalPage() {
-  const services = useSiteValue("services", digitalServices).filter((d) => d.aktif !== false);
+  const { items: services } = usePublicList("services");
   return (
     <PageShell title="Layanan Digital" sub="Akses layanan digital UPT SMPN 1 Baradatu dalam satu tempat">
       <div className="digital-page">
@@ -46,7 +45,7 @@ export default function LayananDigitalPage() {
 
           <div className="digital-grid">
             {services.map((service) => (
-              <article className="digital-card" key={service.nama}>
+              <article className="digital-card" key={service.id || service.nama}>
                 <div className="digital-card-top">
                   <span className="digital-icon" style={{ background: service.warna }} aria-hidden="true">{service.ikon}</span>
                 </div>

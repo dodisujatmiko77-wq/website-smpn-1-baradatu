@@ -12,10 +12,10 @@ import Galeri from "../sections/Galeri";
 import EkosistemDigital from "../sections/EkosistemDigital";
 import PPDB from "../sections/PPDB";
 import Kontak from "../sections/Kontak";
-import { defaultHomeSettings, useSiteValue } from "../data/siteStore";
+import { useHomeSettings } from "../data/publicData";
 
 export default function Home() {
-  const visible = useSiteValue("homeSettings", defaultHomeSettings);
+  const visible = useHomeSettings();
   return (
     <div className="home-page">
       <Seo

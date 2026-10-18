@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Button from "./Button";
 import { menuData } from "../data/menuData";
-import { schoolData as s } from "../data/schoolData";
+import { useSchoolData } from "../data/publicData";
 
 const FB = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 42 42'%3E%3Crect width='42' height='42' rx='10' fill='%230F4C81'/%3E%3Ctext x='21' y='25' font-size='11' fill='white' text-anchor='middle' font-family='sans-serif'%3ELOGO%3C/text%3E%3C/svg%3E";
 
@@ -32,6 +32,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false), [sub, setSub] = useState(null), [sc, setSc] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false), [query, setQuery] = useState("");
   const searchInputRef = useRef(null);
+  const s = useSchoolData();
   const { pathname } = useLocation();
 
   useEffect(() => {

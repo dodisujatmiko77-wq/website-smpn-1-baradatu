@@ -46,7 +46,7 @@ export const defaultSchoolSettings = {
   name: 'UPT SMPN 1 BARADATU', npsn: '[NPSN]', nss: '[NSS]',
   alamat: '[Alamat Sekolah]', kecamatan: 'Baradatu', kabupaten: 'Way Kanan', provinsi: 'Lampung',
   email: '[email@sekolah.sch.id]', telp: '[08xxxxxxxxxx]', website: '',
-  akreditasi: '', kepalaSekolah: '', logo: '', heroImage: '', schoolImage: '',
+  akreditasi: '', kepalaSekolah: '', jumlahSiswa: '', logo: '', heroImage: '', schoolImage: '',
 };
 
 export function read(key, fallback) {
@@ -135,7 +135,7 @@ export const tableMap = {
 };
 
 const toDb = {
-  news: (x) => ({ id: x.id && String(x.id).length > 20 ? x.id : undefined, title: x.judul || '', category: x.kategori || null, publish_date: x.tanggal || null, summary: x.ringkasan || null, photo_url: x.foto || null, status: x.terbit === false ? 'draft' : 'published', show_home: !!x.homepage }),
+  news: (x) => ({ id: x.id && String(x.id).length > 20 ? x.id : undefined, title: x.judul || '', category: x.kategori || null, publish_date: x.tanggal || null, summary: x.ringkasan || null, content: x.content || null, photo_url: x.foto || null, status: x.terbit === false ? 'draft' : 'published', show_home: !!x.homepage }),
   announcements: (x) => ({ id: x.id && String(x.id).length > 20 ? x.id : undefined, title: x.judul || '', publish_date: x.tgl || null, badge: x.badge || null, content: x.content || null, status: x.terbit === false ? 'draft' : 'published', show_home: !!x.homepage }),
   agenda: (x) => ({ id: x.id && String(x.id).length > 20 ? x.id : undefined, name: x.nama || '', event_date: x.tgl || null, time_text: x.jam || null, location: x.lokasi || null, description: x.description || null, status: x.terbit === false ? 'draft' : 'published', show_home: !!x.homepage }),
   achievements: (x) => ({ id: x.id && String(x.id).length > 20 ? x.id : undefined, name: x.nama || '', student_team: x.siswa || null, level: x.tingkat || null, year: x.tahun ? Number(x.tahun) : null, photo_url: x.foto || null, description: x.description || null, status: x.terbit === false ? 'draft' : 'published', show_home: !!x.homepage }),
@@ -145,7 +145,7 @@ const toDb = {
 };
 
 const fromDb = {
-  news: (x) => ({ id: x.id, judul: x.title, kategori: x.category || '', tanggal: x.publish_date || '', ringkasan: x.summary || '', foto: x.photo_url || '', terbit: x.status === 'published', homepage: !!x.show_home }),
+  news: (x) => ({ id: x.id, judul: x.title, kategori: x.category || '', tanggal: x.publish_date || '', ringkasan: x.summary || '', content: x.content || '', foto: x.photo_url || '', terbit: x.status === 'published', homepage: !!x.show_home }),
   announcements: (x) => ({ id: x.id, judul: x.title, tgl: x.publish_date || '', badge: x.badge || '', content: x.content || '', terbit: x.status === 'published', homepage: !!x.show_home }),
   agenda: (x) => ({ id: x.id, nama: x.name, tgl: x.event_date || '', jam: x.time_text || '', lokasi: x.location || '', description: x.description || '', terbit: x.status === 'published', homepage: !!x.show_home }),
   achievements: (x) => ({ id: x.id, nama: x.name, siswa: x.student_team || '', tingkat: x.level || '', tahun: x.year || '', foto: x.photo_url || '', description: x.description || '', terbit: x.status === 'published', homepage: !!x.show_home }),
@@ -189,9 +189,10 @@ export async function fetchCollection(key) {
 export async function saveCollectionItem(key, item) {
   if (!isSupabaseConfigured || !supabase || !tableMap[key]) {
     const items = read(key, []);
-    const next = item.id ? items.map(x => x.id === item.id ? item : x) : [...items, { ...item, id: Date.now() }];
+    const row = item.id ? item : { ...item, id: Date.now() };
+    const next = item.id ? items.map(x => x.id === item.id ? row : x) : [row, ...items];
     write(key, next);
-    return item;
+    return row;
   }
   const payload = toDb[key](item);
   const { data, error } = await supabase.from(tableMap[key]).upsert(payload).select('*').single();
@@ -230,12 +231,12 @@ export async function fetchSchoolSettings() {
   const { data, error } = await supabase.from('school_settings').select('*').limit(1).maybeSingle();
   if (error) throw error;
   if (!data) return defaultSchoolSettings;
-  return { ...defaultSchoolSettings, ...data, kepalaSekolah: data.kepala_sekolah || '', logo: data.logo_url || '', heroImage: data.hero_image_url || '', schoolImage: data.school_image_url || '' };
+  return { ...defaultSchoolSettings, ...data, kepalaSekolah: data.kepala_sekolah || '', jumlahSiswa: data.student_count ?? '', logo: data.logo_url || '', heroImage: data.hero_image_url || '', schoolImage: data.school_image_url || '' };
 }
 
 export async function saveSchoolSettings(value) {
   if (!isSupabaseConfigured || !supabase) { write('schoolSettings', value); return; }
-  const payload = { name: value.name || '', npsn: value.npsn || null, nss: value.nss || null, alamat: value.alamat || null, kecamatan: value.kecamatan || null, kabupaten: value.kabupaten || null, provinsi: value.provinsi || null, email: value.email || null, telp: value.telp || null, website: value.website || null, akreditasi: value.akreditasi || null, kepala_sekolah: value.kepalaSekolah || null, logo_url: value.logo || null, hero_image_url: value.heroImage || null, school_image_url: value.schoolImage || null };
+  const payload = { name: value.name || '', npsn: value.npsn || null, nss: value.nss || null, alamat: value.alamat || null, kecamatan: value.kecamatan || null, kabupaten: value.kabupaten || null, provinsi: value.provinsi || null, email: value.email || null, telp: value.telp || null, website: value.website || null, akreditasi: value.akreditasi || null, kepala_sekolah: value.kepalaSekolah || null, student_count: value.jumlahSiswa === '' || value.jumlahSiswa == null ? null : Number(value.jumlahSiswa), logo_url: value.logo || null, hero_image_url: value.heroImage || null, school_image_url: value.schoolImage || null };
   const { data: existing } = await supabase.from('school_settings').select('id').limit(1).maybeSingle();
   if (existing?.id) payload.id = existing.id;
   const { error } = await supabase.from('school_settings').upsert(payload).select().single();
@@ -278,4 +279,28 @@ export async function saveAuditRemote(action, detail) {
   const { data: auth } = await supabase.auth.getUser();
   const { error } = await supabase.from('audit_logs').insert({ actor_id: auth.user?.id || null, action, detail });
   if (error) throw error;
+}
+
+// --- Upload foto ---------------------------------------------------------------
+// Supabase aktif: file disimpan di bucket publik `site-media` dan URL publiknya dikembalikan.
+// Mode prototype: gambar disimpan sebagai data URL di browser (hanya untuk uji coba).
+const MAX_UPLOAD_MB = 5;
+
+export async function uploadMedia(file, folder = 'umum') {
+  if (!file) throw new Error('Pilih file terlebih dahulu.');
+  if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) throw new Error('Format foto harus JPG, PNG, WEBP, atau GIF.');
+  if (file.size > MAX_UPLOAD_MB * 1024 * 1024) throw new Error(`Ukuran foto maksimal ${MAX_UPLOAD_MB} MB.`);
+  if (!isSupabaseConfigured || !supabase) {
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Gagal membaca file.'));
+      reader.readAsDataURL(file);
+    });
+  }
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from('site-media').upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type });
+  if (error) throw error;
+  return supabase.storage.from('site-media').getPublicUrl(path).data.publicUrl;
 }

@@ -1,19 +1,19 @@
 import Card from "../components/Card";
 import Photo from "../components/Photo";
 import SectionHead from "../components/SectionHead";
-import { achievementData } from "../data/achievementData";
-import { useSiteValue } from "../data/siteStore";
-export default function Prestasi({ bare }) {
-  const items = useSiteValue("achievements", achievementData);
+import { usePublicList } from "../data/publicData";
+export default function Prestasi({ bare, home = true }) {
+  const { items, loading } = usePublicList("achievements", home ? { home: true, limit: 3 } : {});
   return (
     <div>
       {!bare && <SectionHead title="Prestasi & Pencapaian" to="/prestasi" />}
       <div className="pg">
-        {items.filter(a=>a.terbit!==false && a.homepage!==false).map((a, i) => (
-          <Card key={i}><Photo src={a.foto} alt="Foto prestasi" />
-            <div className="b"><h3>{a.nama}</h3><p>{a.siswa}<br />Tingkat {a.tingkat} • {a.tahun}</p></div></Card>
+        {items.map((a, i) => (
+          <Card key={a.id || i}><Photo src={a.foto} alt={a.sample ? "Foto prestasi" : a.nama} />
+            <div className="b"><h3>{a.nama}</h3><p>{a.siswa}{a.siswa && <br />}{[a.tingkat && `Tingkat ${a.tingkat}`, a.tahun].filter(Boolean).join(" • ")}</p></div></Card>
         ))}
       </div>
+      {!loading && !items.length && home && <p className="home-empty">Belum ada prestasi yang diterbitkan.</p>}
     </div>
   );
 }

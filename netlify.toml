@@ -1,0 +1,38 @@
+# Konfigurasi Netlify — UPT SMPN 1 Baradatu
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Aplikasi React (SPA): semua alamat diarahkan ke index.html.
+# File yang benar-benar ada (gambar, robots.txt, sitemap.xml) tetap dilayani apa adanya.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# File hasil build memiliki hash di namanya, aman disimpan lama di cache browser
+[[headers]]
+  for = "/assets/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+[[headers]]
+  for = "/assets/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Panel admin tidak perlu diindeks mesin pencari
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

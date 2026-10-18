@@ -29,6 +29,7 @@ import { achievementData } from '../data/achievementData';
 import { galleryData } from '../data/galleryData';
 import { digitalServices } from '../data/digitalServices';
 import StaffManager from './StaffManager';
+import ImageField from './ImageField';
 import { ContactSettings, ExtraManager, PpdbSettings } from './SettingsAdmin';
 import './admin.css';
 
@@ -39,30 +40,49 @@ const labels = {
   digital: 'Ekosistem Digital', ppdb: 'PPDB', kontak: 'Kontak',
 };
 
+// [kolom, label, jenis input, pilihan]
+const NEWS_CATS = ['Sekolah','Kegiatan','Prestasi','Akademik','Pengumuman'];
+const GALLERY_CATS = ['Pembelajaran','Kegiatan','Prestasi','Upacara','Ekstrakurikuler'];
 const fieldMap = {
-  news: [['judul','Judul'],['kategori','Kategori'],['tanggal','Tanggal'],['ringkasan','Ringkasan'],['foto','URL Foto']],
-  announcements: [['judul','Judul'],['tgl','Tanggal'],['badge','Badge'],['content','Isi Pengumuman']],
-  agenda: [['nama','Nama Agenda'],['tgl','Tanggal'],['jam','Jam'],['lokasi','Lokasi'],['description','Deskripsi']],
-  achievements: [['nama','Nama Prestasi'],['siswa','Siswa / Tim'],['tingkat','Tingkat'],['tahun','Tahun'],['foto','URL Foto'],['description','Keterangan']],
-  gallery: [['judul','Judul'],['kat','Kategori'],['foto','URL Foto'],['caption','Keterangan']],
-  services: [['nama','Nama Layanan'],['desk','Deskripsi'],['ikon','Ikon'],['warna','Warna'],['url','URL'],['tombol','Teks Tombol']],
-  facilities: [['nama','Nama Fasilitas'],['deskripsi','Deskripsi'],['foto','URL Foto'],['urutan','Urutan']],
+  news: [['judul','Judul'],['kategori','Kategori','select',NEWS_CATS],['tanggal','Tanggal Terbit','date'],['foto','Foto Utama','image'],['ringkasan','Ringkasan (tampil di kartu berita)','textarea'],['content','Isi Berita (pisahkan paragraf dengan baris kosong)','longtext']],
+  announcements: [['judul','Judul'],['tgl','Tanggal','date'],['badge','Label','select',['PENTING','INFO','BARU']],['content','Isi Pengumuman','longtext']],
+  agenda: [['nama','Nama Agenda'],['tgl','Tanggal','date'],['jam','Jam (mis. 07.30 WIB)'],['lokasi','Lokasi'],['description','Deskripsi','textarea']],
+  achievements: [['nama','Nama Prestasi'],['siswa','Siswa / Tim'],['tingkat','Tingkat (mis. Kabupaten)'],['tahun','Tahun','number'],['foto','Foto','image'],['description','Keterangan','textarea']],
+  gallery: [['judul','Judul'],['kat','Kategori','select',GALLERY_CATS],['foto','Foto','image'],['caption','Keterangan','textarea']],
+  services: [['nama','Nama Layanan'],['desk','Deskripsi','textarea'],['ikon','Ikon (emoji)'],['warna','Warna','color'],['url','URL (diawali https://)'],['tombol','Teks Tombol']],
+  facilities: [['nama','Nama Fasilitas'],['deskripsi','Deskripsi','textarea'],['foto','Foto','image'],['urutan','Urutan','number']],
 };
 
+function Field({ spec, value, onChange, folder }) {
+  const [key, label, type = 'text', options] = spec;
+  const v = value ?? '';
+  const set = (e) => onChange(key, e.target.value);
+  if (type === 'image') return <ImageField label={label} value={v} onChange={(url) => onChange(key, url)} folder={folder} wide />;
+  if (type === 'textarea' || type === 'longtext') return <label style={{ gridColumn: '1 / -1' }}>{label}<textarea rows={type === 'longtext' ? 12 : 3} value={v} onChange={set} /></label>;
+  if (type === 'select') return <label>{label}<select value={v} onChange={set}><option value="">— Pilih —</option>{options.map((o) => <option key={o} value={o}>{o}</option>)}</select></label>;
+  if (type === 'color') return <label>{label}<input type="color" value={/^#[0-9a-f]{6}$/i.test(v) ? v : '#0f4c81'} onChange={set} /></label>;
+  return <label>{label}<input type={type} value={v} onChange={set} /></label>;
+}
+
+// Data contoh untuk mode prototype; setiap baris diberi id agar bisa diedit tanpa membuat salinan baru
+const seed = (key, rows, extra) => rows.map((x, i) => ({ ...x, ...extra, id: `contoh-${key}-${i + 1}` }));
 const localSeed = {
-  news: newsData.map(x => ({ ...x, terbit: true, homepage: true })),
-  announcements: announcementData.map(x => ({ ...x, terbit: true, homepage: true })),
-  agenda: agendaData.map(x => ({ ...x, terbit: true, homepage: true })),
-  achievements: achievementData.map(x => ({ ...x, terbit: true, homepage: true })),
-  gallery: galleryData.map(x => ({ ...x, terbit: true, homepage: true })),
-  services: digitalServices.map(x => ({ ...x, aktif: true })),
+  news: seed('news', newsData, { terbit: true, homepage: true }),
+  announcements: seed('announcements', announcementData, { terbit: true, homepage: true }),
+  agenda: seed('agenda', agendaData, { terbit: true, homepage: true }),
+  achievements: seed('achievements', achievementData, { terbit: true, homepage: true }),
+  gallery: seed('gallery', galleryData, { terbit: true, homepage: true }),
+  services: seed('services', digitalServices, { aktif: true }),
 };
 
 function seedLocalDefaults() {
   if (isSupabaseConfigured) return;
   const defaults = { homeSettings: defaultHomeSettings, schoolSettings: defaultSchoolSettings, ...localSeed, audit: [] };
   Object.entries(defaults).forEach(([key, value]) => {
-    if (!read(key, null)) write(key, value);
+    const current = read(key, null);
+    if (!current) write(key, value);
+    // Perbaiki data prototype lama yang tersimpan tanpa id
+    else if (Array.isArray(current) && current.some(x => x && x.id == null)) write(key, current.map((x, i) => (x && x.id == null ? { ...x, id: `contoh-${key}-${i + 1}` } : x)));
   });
 }
 seedLocalDefaults();
@@ -71,7 +91,7 @@ async function recordAudit(action, detail) {
   try { await saveAuditRemote(action, detail); } catch { saveAudit(action, detail); }
 }
 
-function Login() {
+function Login({ onLogin }) {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -85,17 +105,21 @@ function Login() {
       if (!production) {
         if ((identifier === 'admin' || identifier === 'superadmin') && password === 'admin123') {
           const role = identifier === 'admin' ? 'admin' : 'superadmin';
-          write('session', { name: role === 'admin' ? 'Administrator' : 'Super Admin', role });
+          const next = { name: role === 'admin' ? 'Administrator' : 'Super Admin', role };
+          write('session', next);
           await recordAudit('Login', 'Masuk ke panel admin mode prototype');
-          navigate('/admin');
+          onLogin(next);
+          navigate('/admin', { replace: true });
           return;
         }
         throw new Error('Akun demo: admin / admin123');
       }
       const result = await signInAdmin(identifier, password);
-      write('session', { name: result.user?.email || 'Administrator', role: result.role, userId: result.user?.id });
+      const next = { name: result.user?.email || 'Administrator', role: result.role, userId: result.user?.id };
+      write('session', next);
       await recordAudit('Login', 'Masuk ke panel admin produksi');
-      navigate('/admin');
+      onLogin(next);
+      navigate('/admin', { replace: true });
     } catch (err) {
       setError(err?.message || 'Login gagal.');
     }
@@ -154,7 +178,7 @@ const sidebarGroups = [
 ];
 const menu = sidebarGroups.flatMap(group => group.items);
 
-function Layout({ session }) {
+function Layout({ session, onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [openGroups, setOpenGroups] = useState(() => ({
@@ -179,7 +203,8 @@ function Layout({ session }) {
   async function logout() {
     await recordAudit('Logout', 'Keluar dari panel admin');
     await signOutAdmin();
-    navigate('/admin/login');
+    onLogout();
+    navigate('/admin/login', { replace: true });
   }
   return <div className="admin-shell">
     <aside className="admin-side">
@@ -251,8 +276,8 @@ function DataSekolah() {
 function SchoolSingle() {
   const { module } = useParams();
   const config = {
-    history: { title:'Sejarah Sekolah', eyebrow:'DATA SEKOLAH', intro:'Kelola narasi sejarah resmi sekolah.', fields:[['title','Judul'],['content','Isi Sejarah']], textareas:['content'] },
-    vision: { title:'Visi & Misi', eyebrow:'DATA SEKOLAH', intro:'Kelola visi dan misi resmi sekolah.', fields:[['vision','Visi'],['mission','Misi']], textareas:['vision','mission'] },
+    history: { title:'Sejarah Sekolah', eyebrow:'DATA SEKOLAH', intro:'Kelola narasi sejarah resmi sekolah. Pisahkan paragraf dengan baris baru.', fields:[['title','Judul'],['content','Isi Sejarah']], textareas:['content'] },
+    vision: { title:'Visi & Misi', eyebrow:'DATA SEKOLAH', intro:'Kelola visi dan misi resmi sekolah. Tulis setiap butir misi pada baris baru.', fields:[['vision','Visi'],['mission','Misi (satu butir per baris)']], textareas:['vision','mission'] },
     structure: { title:'Struktur Organisasi', eyebrow:'DATA SEKOLAH', intro:'Kelola deskripsi dan bagan struktur organisasi.', fields:[['title','Judul'],['description','Deskripsi'],['chart_image_url','URL Gambar Bagan']], textareas:['description'] },
     principal: { title:'Kepala Sekolah', eyebrow:'DATA SEKOLAH', intro:'Kelola profil kepala sekolah yang akan ditampilkan pada website.', fields:[['name','Nama Lengkap'],['nip','NIP'],['nuptk','NUPTK'],['position','Jabatan'],['period','Periode Menjabat'],['photo_url','URL Foto'],['greeting','Sambutan Kepala Sekolah']], textareas:['greeting'] },
   }[module];
@@ -260,7 +285,7 @@ function SchoolSingle() {
   useEffect(()=>{ if(!config){setLoading(false);return;} let alive=true; fetchSingleSchoolData(module).then(x=>alive&&setData(x)).catch(e=>alert(e.message||'Gagal memuat data.')).finally(()=>alive&&setLoading(false)); return ()=>{alive=false}; },[module]);
   if(!config) return <Navigate to="/admin/data-sekolah" replace/>;
   async function save(){setSaving(true);try{const saved=await saveSingleSchoolData(module,data);setData(saved);await recordAudit(`Mengubah ${config.title.toLowerCase()}`,'Memperbarui data sekolah');alert('Data disimpan.');}catch(e){alert(e.message||'Gagal menyimpan.')}finally{setSaving(false)}}
-  return <div className="page-stack"><div className="section-intro"><span className="eyebrow">{config.eyebrow}</span><h1>{config.title}</h1><p>{config.intro}</p></div><div className="admin-card form-card">{loading||!data?<div className="empty">Memuat data…</div>:<><div className="form-grid">{config.fields.map(([key,label])=> config.textareas.includes(key)?<label key={key}>{label}<textarea rows="8" value={data[key]||''} onChange={e=>setData({...data,[key]:e.target.value})}/></label>:<label key={key}>{label}<input value={data[key]||''} onChange={e=>setData({...data,[key]:e.target.value})}/></label>)}</div><div className="checks"><label><input type="checkbox" checked={data.status==='published'} onChange={e=>setData({...data,status:e.target.checked?'published':'draft'})}/> Publikasikan ke website</label></div><div className="form-actions"><Link className="admin-btn ghost" to="/admin/data-sekolah">Kembali</Link><button className="admin-btn primary" onClick={save} disabled={saving}>{saving?'Menyimpan…':'Simpan Data'}</button></div></>}</div></div>;
+  return <div className="page-stack"><div className="section-intro"><span className="eyebrow">{config.eyebrow}</span><h1>{config.title}</h1><p>{config.intro}</p></div><div className="admin-card form-card">{loading||!data?<div className="empty">Memuat data…</div>:<><div className="form-grid">{config.fields.map(([key,label])=> /_url$/.test(key)?<ImageField key={key} label={label.replace(/^URL /,'')} value={data[key]||''} onChange={(url)=>setData({...data,[key]:url})} folder="data-sekolah" wide/>:config.textareas.includes(key)?<label key={key}>{label}<textarea rows="8" value={data[key]||''} onChange={e=>setData({...data,[key]:e.target.value})}/></label>:<label key={key}>{label}<input value={data[key]||''} onChange={e=>setData({...data,[key]:e.target.value})}/></label>)}</div><div className="checks"><label><input type="checkbox" checked={data.status==='published'} onChange={e=>setData({...data,status:e.target.checked?'published':'draft'})}/> Publikasikan ke website</label></div><div className="form-actions"><Link className="admin-btn ghost" to="/admin/data-sekolah">Kembali</Link><button className="admin-btn primary" onClick={save} disabled={saving}>{saving?'Menyimpan…':'Simpan Data'}</button></div></>}</div></div>;
 }
 
 function FacilityManager() {
@@ -275,10 +300,11 @@ function FacilityManager() {
 
 function Profil() {
   const [data, setData] = useState(defaultSchoolSettings); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false);
-  const fields = [['name','Nama Resmi Sekolah'],['npsn','NPSN'],['nss','NSS'],['alamat','Alamat'],['kecamatan','Kecamatan'],['kabupaten','Kabupaten'],['provinsi','Provinsi'],['email','Email'],['telp','Telepon'],['website','Website'],['akreditasi','Akreditasi'],['kepalaSekolah','Kepala Sekolah']];
+  const fields = [['name','Nama Resmi Sekolah'],['npsn','NPSN'],['nss','NSS'],['alamat','Alamat'],['kecamatan','Kecamatan'],['kabupaten','Kabupaten'],['provinsi','Provinsi'],['email','Email'],['telp','Telepon'],['website','Website'],['akreditasi','Akreditasi'],['kepalaSekolah','Kepala Sekolah'],['jumlahSiswa','Jumlah Peserta Didik (statistik beranda)']];
+  const images = [['logo','Logo Sekolah (persegi, PNG)'],['heroImage','Foto Banner Beranda (lebar)'],['schoolImage','Foto Gedung Sekolah']];
   useEffect(() => { fetchSchoolSettings().then(setData).finally(() => setLoading(false)); }, []);
   async function save() { setSaving(true); try { await saveSchoolSettings(data); await recordAudit('Mengubah profil sekolah', 'Memperbarui identitas sekolah'); alert('Profil disimpan.'); } catch (e) { alert(e.message || 'Gagal menyimpan.'); } finally { setSaving(false); } }
-  return <div className="page-stack"><div className="section-intro"><span className="eyebrow">DATA RESMI</span><h1>Profil Sekolah</h1><p>Sumber identitas resmi yang digunakan website publik.</p></div><div className="admin-card form-card">{loading ? <div className="empty">Memuat data…</div> : <><div className="form-grid">{fields.map(([key, label]) => <label key={key}>{label}<input value={data[key] || ''} onChange={e => setData(prev => ({ ...prev, [key]: e.target.value }))}/></label>)}</div><div className="form-note">ℹ️ Masukkan hanya data yang memang akan dipublikasikan pada website sekolah.</div><button className="admin-btn primary" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan Profil Sekolah'}</button></>}</div></div>;
+  return <div className="page-stack"><div className="section-intro"><span className="eyebrow">DATA RESMI</span><h1>Profil Sekolah</h1><p>Sumber identitas resmi yang digunakan website publik.</p></div><div className="admin-card form-card">{loading ? <div className="empty">Memuat data…</div> : <><div className="form-grid">{fields.map(([key, label]) => <label key={key}>{label}<input type={key === 'jumlahSiswa' ? 'number' : 'text'} value={data[key] ?? ''} onChange={e => setData(prev => ({ ...prev, [key]: e.target.value }))}/></label>)}{images.map(([key, label]) => <ImageField key={key} label={label} value={data[key] || ''} onChange={(url) => setData(prev => ({ ...prev, [key]: url }))} folder="sekolah" wide />)}</div><div className="form-note">ℹ️ Masukkan hanya data yang memang akan dipublikasikan pada website sekolah.</div><button className="admin-btn primary" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan Profil Sekolah'}</button></>}</div></div>;
 }
 
 function Manager() {
@@ -290,9 +316,25 @@ function Manager() {
   return <div className="page-stack"><div className="section-intro row"><div><span className="eyebrow">MANAJEMEN KONTEN</span><h1>{meta.label}</h1><p>Kelola konten, status terbit, dan tampil di homepage.</p></div><button className="admin-btn primary" onClick={() => setEdit({})}>+ Tambah</button></div>{edit !== null && <Form meta={meta} type={type} initial={edit} onCancel={() => setEdit(null)} onSave={save}/>}<div className="admin-card table-card"><table><thead><tr><th>Konten</th><th>Status</th><th>Homepage</th><th>Aksi</th></tr></thead><tbody>{loading ? <tr><td colSpan="4" className="empty">Memuat data…</td></tr> : items.map(item => <tr key={item.id}><td><b>{item.judul || item.nama || item.tgl}</b><small>{item.kategori || item.kat || item.siswa || item.desk || ''}</small></td><td>{type === 'services' ? <span className={`status-chip ${item.aktif ? 'published' : 'draft'}`}>{item.aktif ? 'Aktif' : 'Nonaktif'}</span> : <span className={`status-chip ${item.terbit === false ? 'draft' : 'published'}`}>{item.terbit === false ? 'Draft' : 'Terbit'}</span>}</td><td>{type === 'services' ? '—' : item.homepage ? '✓' : '—'}</td><td><button className="mini-btn" onClick={() => setEdit(item)}>Edit</button><button className="mini-btn danger" onClick={() => remove(item.id)}>Hapus</button></td></tr>)}{!loading && !items.length && <tr><td colSpan="4" className="empty">Belum ada data.</td></tr>}</tbody></table></div></div>;
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+function validate(type, value) {
+  const fields = fieldMap[type] || [];
+  const title = fields[0];
+  if (title && !String(value[title[0]] || '').trim()) return `${title[1]} wajib diisi.`;
+  const bad = fields.find(([key, , t]) => t === 'date' && value[key] && !ISO_DATE.test(value[key]));
+  if (bad) return `${bad[1]} belum valid. Pilih tanggal dari kalender.`;
+  if (value.url && value.url !== '#' && !/^(https?:\/\/|\/)/i.test(value.url)) return 'URL harus diawali https:// atau /';
+  return '';
+}
+
 function Form({ meta, type, initial, onCancel, onSave }) {
-  const [value, setValue] = useState(initial); const fields = fieldMap[type] || [];
-  return <div className="admin-card form-card"><div className="card-title"><div><span className="eyebrow">FORM DATA</span><h3>{initial.id ? 'Edit' : 'Tambah'} {meta.label}</h3></div></div><div className="form-grid">{fields.map(([key, label]) => <label key={key}>{label}<input value={value[key] || ''} onChange={e => setValue(prev => ({ ...prev, [key]: e.target.value }))}/></label>)}</div>{type === 'services' || type === 'facilities' ? <div className="checks"><label><input type="checkbox" checked={value.aktif !== false} onChange={e => setValue(prev => ({ ...prev, aktif: e.target.checked }))}/> Aktif</label></div> : <div className="checks"><label><input type="checkbox" checked={value.terbit !== false} onChange={e => setValue(prev => ({ ...prev, terbit: e.target.checked }))}/> Terbit</label><label><input type="checkbox" checked={!!value.homepage} onChange={e => setValue(prev => ({ ...prev, homepage: e.target.checked }))}/> Tampil di homepage</label></div>}<div className="form-actions"><button className="admin-btn ghost" onClick={onCancel}>Batal</button><button className="admin-btn primary" onClick={() => onSave(value)}>Simpan</button></div></div>;
+  // Data lama yang tanggalnya berupa teks (mis. "[Tanggal]") dikosongkan agar bisa dipilih ulang
+  const [value, setValue] = useState(() => { const v = { ...initial }; (fieldMap[type] || []).forEach(([k, , t]) => { if (t === 'date' && v[k] && !ISO_DATE.test(v[k])) v[k] = ''; }); return v; });
+  const [saving, setSaving] = useState(false);
+  const fields = fieldMap[type] || [];
+  const change = (key, v) => setValue(prev => ({ ...prev, [key]: v }));
+  async function submit() { const problem = validate(type, value); if (problem) { alert(problem); return; } setSaving(true); try { await onSave(value); } finally { setSaving(false); } }
+  return <div className="admin-card form-card"><div className="card-title"><div><span className="eyebrow">FORM DATA</span><h3>{initial.id ? 'Edit' : 'Tambah'} {meta.label}</h3></div></div><div className="form-grid">{fields.map((spec) => <Field key={spec[0]} spec={spec} value={value[spec[0]]} onChange={change} folder={type}/>)}</div>{type === 'services' || type === 'facilities' ? <div className="checks"><label><input type="checkbox" checked={value.aktif !== false} onChange={e => setValue(prev => ({ ...prev, aktif: e.target.checked }))}/> Aktif</label></div> : <div className="checks"><label><input type="checkbox" checked={value.terbit !== false} onChange={e => setValue(prev => ({ ...prev, terbit: e.target.checked }))}/> Terbit</label><label><input type="checkbox" checked={!!value.homepage} onChange={e => setValue(prev => ({ ...prev, homepage: e.target.checked }))}/> Tampil di homepage</label></div>}<div className="form-actions"><button className="admin-btn ghost" onClick={onCancel} disabled={saving}>Batal</button><button className="admin-btn primary" onClick={submit} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan'}</button></div></div>;
 }
 
 function Audit() {
@@ -302,8 +344,14 @@ function Audit() {
 }
 
 export default function AdminApp() {
+  // Build produksi tanpa Supabase: jangan buka login demo (admin/admin123) ke publik
+  if (import.meta.env.PROD && !isSupabaseConfigured) return <div className="admin-disabled"><div><span className="eyebrow">PANEL ADMIN</span><h1>Database belum terhubung</h1><p>Isi <code>VITE_SUPABASE_URL</code> dan <code>VITE_SUPABASE_ANON_KEY</code> di pengaturan Environment variables hosting, lalu deploy ulang.</p></div></div>;
+  return <AdminRoot />;
+}
+
+function AdminRoot() {
   const [session, setSession] = useState(undefined);
   useEffect(() => { let alive = true; (async () => { try { const auth = await getAuthSession(); if (!alive) return; if (isSupabaseConfigured) { if (!auth) setSession(null); else { const { supabase } = await import('../lib/supabase'); const { data } = await supabase.from('user_roles').select('role').eq('user_id', auth.user.id).maybeSingle(); setSession(data ? { name: auth.user.email, role: data.role, userId: auth.user.id } : null); } } else setSession(read('session', null)); } catch { if (alive) setSession(null); } })(); return () => { alive = false; }; }, []);
   if (session === undefined) return <div className="admin-loading">Memuat panel admin…</div>;
-  return <Routes><Route path="login" element={session ? <Navigate to="/admin" replace/> : <Login/>}/><Route path="*" element={session ? <Layout session={session}/> : <Navigate to="/admin/login" replace/>}/></Routes>;
+  return <Routes><Route path="login" element={session ? <Navigate to="/admin" replace/> : <Login onLogin={setSession}/>}/><Route path="*" element={session ? <Layout session={session} onLogout={() => setSession(null)}/> : <Navigate to="/admin/login" replace/>}/></Routes>;
 }

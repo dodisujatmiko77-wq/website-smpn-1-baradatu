@@ -1,4 +1,7 @@
+import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
+import Card from "../components/Card";
+import { usePublicList } from "../data/publicData";
 
 const categories = [
   { no: "01", title: "Kegiatan Akademik", text: "Jadwal dan kegiatan yang berkaitan dengan proses pembelajaran dan akademik sekolah." },
@@ -7,11 +10,13 @@ const categories = [
 ];
 
 export default function AgendaPage() {
+  const { items: all } = usePublicList("agenda");
+  const list = all.filter((a) => !a.sample);
   return (
     <PageShell title="Agenda Sekolah" sub="Jadwal kegiatan UPT SMPN 1 Baradatu">
       <div className="agenda-page">
         <div className="page-breadcrumb">
-          <a href="/">Beranda</a><span aria-hidden="true">›</span><span>Agenda</span>
+          <Link to="/">Beranda</Link><span aria-hidden="true">›</span><span>Agenda</span>
         </div>
 
         <section className="agenda-intro card">
@@ -25,7 +30,7 @@ export default function AgendaPage() {
           </div>
           <div className="agenda-status">
             <span className="status-dot" aria-hidden="true"></span>
-            <div><strong>Data resmi belum tersedia</strong><span>Siap diisi oleh admin/operator sekolah</span></div>
+            {list.length ? <div><strong>{list.length} agenda</strong><span>Jadwal resmi yang telah diterbitkan</span></div> : <div><strong>Data resmi belum tersedia</strong><span>Siap diisi oleh admin/operator sekolah</span></div>}
           </div>
         </section>
 
@@ -38,11 +43,18 @@ export default function AgendaPage() {
             </div>
           </div>
 
-          <div className="agenda-empty card">
+          {list.length ? (
+            <div className="ag agenda-list-page">
+              {list.map((a) => (
+                <Card key={a.id}><div className="dt">{a.hari}<small>{a.bulan}</small></div>
+                  <div><h3>{a.nama}</h3><p>📅 {a.tglLabel}{a.jam && <><br />🕗 {a.jam}</>}{a.lokasi && <><br />📍 {a.lokasi}</>}</p>{a.description && <p className="agenda-desc">{a.description}</p>}</div></Card>
+              ))}
+            </div>
+          ) : <div className="agenda-empty card">
             <div className="agenda-empty-icon" aria-hidden="true">▣</div>
             <h3>Belum ada agenda yang ditampilkan</h3>
             <p>Data agenda resmi sekolah belum tersedia. Setelah data dimasukkan oleh admin/operator, jadwal kegiatan akan muncul di halaman ini.</p>
-          </div>
+          </div>}
         </section>
 
         <section className="agenda-section">
@@ -68,13 +80,13 @@ export default function AgendaPage() {
           </div>
         </section>
 
-        <section className="agenda-note">
+        {!list.length && <section className="agenda-note">
           <div className="agenda-note-icon" aria-hidden="true">i</div>
           <div>
             <h3>Catatan Pengelolaan Data</h3>
             <p>Judul kegiatan, tanggal, waktu, lokasi, kategori, dan keterangan agenda nantinya diisi berdasarkan informasi resmi sekolah. Tidak ada agenda fiktif yang ditampilkan sebagai kegiatan resmi.</p>
           </div>
-        </section>
+        </section>}
       </div>
     </PageShell>
   );

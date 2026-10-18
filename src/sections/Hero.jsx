@@ -1,16 +1,16 @@
 import Button from "../components/Button";
-import { schoolData as s } from "../data/schoolData";
+import { useSchoolData, useSchoolStats } from "../data/publicData";
 
 export default function Hero() {
+  const s = useSchoolData();
+  const { stats } = useSchoolStats();
   return (
     <section className="hero" aria-labelledby="h1">
       <div className="heroimg" aria-hidden={s.heroImage ? undefined : "true"}>
         {s.heroImage ? (
-          <img src={s.heroImage} alt="" />
+          <img src={s.heroImage} alt="" fetchpriority="high" />
         ) : (
           <div className="hero-placeholder">
-            <span>Foto UPT SMPN 1 Baradatu</span>
-            <small>Tambahkan foto sekolah pada schoolData.heroImage</small>
           </div>
         )}
       </div>
@@ -33,8 +33,8 @@ export default function Hero() {
             </Button>
           </div>
 
-          <div className="stats" aria-label="Statistik sekolah">
-            {s.stats.map(([value, label]) => (
+          {stats.length > 0 && <div className="stats" aria-label="Statistik sekolah">
+            {stats.map(([value, label]) => (
               <div key={label} className="stat">
                 <span className="stat-icon" aria-hidden="true">•</span>
                 <div>
@@ -43,7 +43,7 @@ export default function Hero() {
                 </div>
               </div>
             ))}
-          </div>
+          </div>}
         </div>
       </div>
 

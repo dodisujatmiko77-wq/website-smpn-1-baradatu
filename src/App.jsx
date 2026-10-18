@@ -1,29 +1,34 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import Profil from "./pages/Profil";
-import Sejarah from "./pages/Sejarah";
-import VisiMisi from "./pages/VisiMisi";
-import StrukturOrganisasi from "./pages/StrukturOrganisasi";
-import KepalaSekolah from "./pages/KepalaSekolah";
-import Fasilitas from "./pages/Fasilitas";
-import Guru from "./pages/Guru";
-import Tendik from "./pages/Tendik";
-import Berita from "./pages/Berita";
-import Pengumuman from "./pages/Pengumuman";
-import Agenda from "./pages/Agenda";
-import Prestasi from "./pages/Prestasi";
-import Ekstrakurikuler from "./pages/Ekstrakurikuler";
-import Galeri from "./pages/Galeri";
-import Video from "./pages/Video";
-import Akademik from "./pages/Akademik";
-import PPDB from "./pages/PPDB";
-import LayananDigital from "./pages/LayananDigital";
-import Kontak from "./pages/Kontak";
-import NotFound from "./pages/NotFound";
-import AdminApp from "./admin/AdminApp";
+
+// Halaman selain beranda dimuat saat dibuka, supaya kunjungan pertama lebih ringan.
+// Panel admin dipisah sepenuhnya sehingga kodenya tidak diunduh oleh pengunjung biasa.
+const Profil = lazy(() => import("./pages/Profil"));
+const Sejarah = lazy(() => import("./pages/Sejarah"));
+const VisiMisi = lazy(() => import("./pages/VisiMisi"));
+const StrukturOrganisasi = lazy(() => import("./pages/StrukturOrganisasi"));
+const KepalaSekolah = lazy(() => import("./pages/KepalaSekolah"));
+const Fasilitas = lazy(() => import("./pages/Fasilitas"));
+const Guru = lazy(() => import("./pages/Guru"));
+const Tendik = lazy(() => import("./pages/Tendik"));
+const Berita = lazy(() => import("./pages/Berita"));
+const BeritaDetail = lazy(() => import("./pages/BeritaDetail"));
+const Pengumuman = lazy(() => import("./pages/Pengumuman"));
+const PengumumanDetail = lazy(() => import("./pages/PengumumanDetail"));
+const Agenda = lazy(() => import("./pages/Agenda"));
+const Prestasi = lazy(() => import("./pages/Prestasi"));
+const Ekstrakurikuler = lazy(() => import("./pages/Ekstrakurikuler"));
+const Galeri = lazy(() => import("./pages/Galeri"));
+const Video = lazy(() => import("./pages/Video"));
+const Akademik = lazy(() => import("./pages/Akademik"));
+const PPDB = lazy(() => import("./pages/PPDB"));
+const LayananDigital = lazy(() => import("./pages/LayananDigital"));
+const Kontak = lazy(() => import("./pages/Kontak"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminApp = lazy(() => import("./admin/AdminApp"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -33,12 +38,17 @@ function ScrollToTop() {
   return null;
 }
 
+const Loading = () => <div className="page-loading" role="status" aria-live="polite">Memuat…</div>;
+
 export default function App() {
+  const { pathname } = useLocation();
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
   return (
     <>
       <ScrollToTop />
-      {!window.location.pathname.startsWith("/admin") && <Navbar />}
+      {!isAdmin && <Navbar />}
       <main>
+      <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/admin/*" element={<AdminApp />} />
         <Route path="/" element={<Home />} />
@@ -51,7 +61,9 @@ export default function App() {
         <Route path="/gtk/guru" element={<Guru />} />
         <Route path="/gtk/tendik" element={<Tendik />} />
         <Route path="/berita" element={<Berita />} />
+        <Route path="/berita/:id" element={<BeritaDetail />} />
         <Route path="/pengumuman" element={<Pengumuman />} />
+        <Route path="/pengumuman/:id" element={<PengumumanDetail />} />
         <Route path="/agenda" element={<Agenda />} />
         <Route path="/prestasi" element={<Prestasi />} />
         <Route path="/ekstrakurikuler" element={<Ekstrakurikuler />} />
@@ -63,8 +75,9 @@ export default function App() {
         <Route path="/kontak" element={<Kontak />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
       </main>
-      {!window.location.pathname.startsWith("/admin") && <Footer />}
+      {!isAdmin && <Footer />}
     </>
   );
 }

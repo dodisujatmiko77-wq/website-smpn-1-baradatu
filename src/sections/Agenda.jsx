@@ -1,18 +1,18 @@
 import Card from "../components/Card";
 import SectionHead from "../components/SectionHead";
-import { agendaData } from "../data/agendaData";
-import { useSiteValue } from "../data/siteStore";
+import { usePublicList } from "../data/publicData";
 export default function Agenda({ bare }) {
-  const items = useSiteValue("agenda", agendaData);
+  const { items, loading } = usePublicList("agenda", { home: true, limit: 3 });
   return (
     <div>
       {!bare && <SectionHead title="Agenda Sekolah" to="/agenda" label="Lihat Kalender" />}
       <div className="ag">
-        {items.filter(a=>a.terbit!==false && a.homepage!==false).map((a, i) => (
-          <Card key={i}><div className="dt">{a.tgl}<small>{a.bln}</small></div>
-            <div><h3>{a.nama}</h3><p>🕗 {a.jam}<br />📍 {a.lokasi}</p></div></Card>
+        {items.map((a, i) => (
+          <Card key={a.id || i}><div className="dt">{a.hari}<small>{a.bulan}</small></div>
+            <div><h3>{a.nama}</h3><p>{a.jam && <>🕗 {a.jam}<br /></>}{a.lokasi && <>📍 {a.lokasi}</>}</p></div></Card>
         ))}
       </div>
+      {!loading && !items.length && <p className="home-empty">Belum ada agenda terdekat.</p>}
     </div>
   );
 }

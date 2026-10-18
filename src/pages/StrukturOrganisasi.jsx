@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
+import { useStructure } from "../data/publicData";
 
 function OrgPlaceholder({ title, subtitle, tone = "primary" }) {
   return (
@@ -10,13 +12,15 @@ function OrgPlaceholder({ title, subtitle, tone = "primary" }) {
 }
 
 export default function StrukturOrganisasiPage() {
+  const st = useStructure();
+  const has = Boolean(st.image || st.description);
   return (
     <PageShell
       title="Struktur Organisasi"
       sub="Susunan organisasi UPT SMPN 1 Baradatu"
     >
       <div className="page-breadcrumb" aria-label="Breadcrumb">
-        <a href="/">Beranda</a><span>›</span><a href="/profil">Profil</a><span>›</span><strong>Struktur Organisasi</strong>
+        <Link to="/">Beranda</Link><span>›</span><Link to="/profil">Profil</Link><span>›</span><strong>Struktur Organisasi</strong>
       </div>
 
       <section className="org-intro">
@@ -31,10 +35,17 @@ export default function StrukturOrganisasiPage() {
         </div>
         <div className="org-status">
           <span className="status-dot" aria-hidden="true" />
-          <div>
-            <strong>Data resmi belum tersedia</strong>
-            <span>Siap diisi oleh admin/operator sekolah.</span>
-          </div>
+          {has ? (
+            <div>
+              <strong>Data resmi sekolah</strong>
+              <span>Struktur organisasi yang berlaku.</span>
+            </div>
+          ) : (
+            <div>
+              <strong>Data resmi belum tersedia</strong>
+              <span>Siap diisi oleh admin/operator sekolah.</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -44,10 +55,15 @@ export default function StrukturOrganisasiPage() {
             <span className="eyebrow">PRATINJAU STRUKTUR</span>
             <h2>Susunan Organisasi</h2>
           </div>
-          <span className="org-badge">Data belum diisi</span>
+          <span className="org-badge">{has ? "Resmi" : "Data belum diisi"}</span>
         </div>
 
-        <div className="org-tree">
+        {has ? (
+          <div className="org-official">
+            {st.description && <p style={{ whiteSpace: "pre-line" }}>{st.description}</p>}
+            {st.image && <a href={st.image} target="_blank" rel="noopener noreferrer"><img src={st.image} alt={`Bagan ${st.title} UPT SMPN 1 Baradatu`} loading="lazy" /></a>}
+          </div>
+        ) : <div className="org-tree">
           <div className="org-level org-level-top">
             <OrgPlaceholder
               title="Kepala Sekolah"
@@ -69,10 +85,10 @@ export default function StrukturOrganisasiPage() {
             <OrgPlaceholder title="Tenaga Kependidikan" subtitle="Data belum diisi" tone="light" />
             <OrgPlaceholder title="Unsur Pendukung" subtitle="Data belum diisi" tone="light" />
           </div>
-        </div>
+        </div>}
       </section>
 
-      <section className="org-note">
+      {!has && <section className="org-note">
         <div className="org-note-icon" aria-hidden="true">i</div>
         <div>
           <h3>Data akan dilengkapi pada tahap akhir</h3>
@@ -82,7 +98,7 @@ export default function StrukturOrganisasiPage() {
             atau operator sekolah dapat memasukkan data resmi pada sistem.
           </p>
         </div>
-      </section>
+      </section>}
     </PageShell>
   );
 }

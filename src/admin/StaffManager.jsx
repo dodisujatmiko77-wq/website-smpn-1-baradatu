@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { DEFAULT_VISIBLE, STAFF_FIELDS, deleteStaff, fetchStaffAdmin, saveStaff } from '../data/staffStore';
 import { saveAuditRemote } from '../data/siteStore';
+import ImageField from './ImageField';
 
 const KINDS = { guru: 'Guru', tendik: 'Tenaga Kependidikan' };
 const STATUS_OPTIONS = ['', 'PNS', 'PPPK', 'GTT / Honorer', 'PTT / Honorer', 'Lainnya'];
@@ -33,7 +34,7 @@ function StaffForm({ kind, initial, onCancel, onSave }) {
         {text('education', 'Pendidikan Terakhir')}
         {text('email', 'Email', 'email')}
         {text('phone', 'Telepon')}
-        {text('photo_url', 'URL Foto')}
+        <ImageField label="Foto" value={v.photo_url || ''} onChange={(url) => setV((p) => ({ ...p, photo_url: url }))} folder="gtk" wide />
         {text('sort_order', 'Urutan Tampil', 'number')}
         <label style={{ gridColumn: '1 / -1' }}>Profil Singkat<textarea rows="4" value={v.bio || ''} onChange={set('bio')} /></label>
       </div>

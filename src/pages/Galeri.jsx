@@ -1,12 +1,16 @@
 import PageShell from "../components/PageShell";
+import { Link } from "react-router-dom";
 import Galeri from "../sections/Galeri";
+import { usePublicList } from "../data/publicData";
 
 export default function GaleriPage() {
+  const { items } = usePublicList("gallery");
+  const count = items.filter((g) => !g.sample).length;
   return (
     <PageShell title="Galeri Kegiatan" sub="Dokumentasi foto kegiatan UPT SMPN 1 Baradatu">
       <div className="gallery-page">
         <div className="page-breadcrumb">
-          <a href="/">Beranda</a><span aria-hidden="true">›</span><a href="/prestasi">Kegiatan</a><span aria-hidden="true">›</span><strong>Galeri</strong>
+          <Link to="/">Beranda</Link><span aria-hidden="true">›</span><Link to="/prestasi">Kegiatan</Link><span aria-hidden="true">›</span><strong>Galeri</strong>
         </div>
 
         <section className="gallery-intro">
@@ -17,7 +21,7 @@ export default function GaleriPage() {
           </div>
           <div className="gallery-status">
             <span className="gallery-status-dot" aria-hidden="true"></span>
-            <div><strong>Data foto resmi</strong><small>Siap dilengkapi oleh admin/operator sekolah</small></div>
+            {count ? <div><strong>{count} foto</strong><small>Dokumentasi resmi sekolah</small></div> : <div><strong>Data foto resmi</strong><small>Siap dilengkapi oleh admin/operator sekolah</small></div>}
           </div>
         </section>
 
@@ -26,13 +30,13 @@ export default function GaleriPage() {
             <div><span className="eyebrow">KOLEKSI FOTO</span><h2>Dokumentasi Kegiatan</h2></div>
             <span className="gallery-badge">Data resmi sekolah</span>
           </div>
-          <Galeri bare />
+          <Galeri bare home={false} />
         </section>
 
-        <div className="gallery-note">
+        {!count && <div className="gallery-note">
           <div className="gallery-note-icon">i</div>
           <div><h3>Catatan Pengelolaan Galeri</h3><p>Foto, judul, kategori, dan keterangan kegiatan nantinya diisi menggunakan dokumentasi resmi sekolah. Placeholder yang tampil saat ini tidak mewakili dokumentasi kegiatan tertentu.</p></div>
-        </div>
+        </div>}
       </div>
     </PageShell>
   );

@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
+import { useSchoolData } from "./data/publicData";
 
 // Halaman selain beranda dimuat saat dibuka, supaya kunjungan pertama lebih ringan.
 // Panel admin dipisah sepenuhnya sehingga kodenya tidak diunduh oleh pengunjung biasa.
@@ -38,6 +39,21 @@ function ScrollToTop() {
   return null;
 }
 
+// Ikon tab browser mengikuti logo yang diunggah di Admin > Profil Sekolah
+function SiteFavicon() {
+  const { logo } = useSchoolData();
+  useEffect(() => {
+    if (!logo) return;
+    for (const rel of ["icon", "apple-touch-icon"]) {
+      let link = document.head.querySelector(`link[rel="${rel}"]`);
+      if (!link) { link = document.createElement("link"); link.rel = rel; document.head.appendChild(link); }
+      link.removeAttribute("type");
+      link.href = logo;
+    }
+  }, [logo]);
+  return null;
+}
+
 const Loading = () => <div className="page-loading" role="status" aria-live="polite">Memuat…</div>;
 
 export default function App() {
@@ -46,6 +62,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <SiteFavicon />
       {!isAdmin && <Navbar />}
       <main>
       <Suspense fallback={<Loading />}>

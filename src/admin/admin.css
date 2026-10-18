@@ -20,3 +20,6 @@
   .nav-group-head span,.nav-group-head b{display:none}
   .admin-side nav a{padding:10px 8px;margin:0}
 }
+
+/* Form GTK */
+.admin-card textarea,.admin-card select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:#fff;color:inherit}

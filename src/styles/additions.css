@@ -166,7 +166,7 @@
 
 /* ===== Footer: kredit pengembang ===== */
 .dev-credit{margin-top:28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 20px;border-radius:18px;background:linear-gradient(120deg,#081226,#0b2547 60%,#0d3a70);border:1px solid rgba(56,189,248,.25);box-shadow:0 10px 30px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.06)}
-.dev-credit img{width:56px;height:56px;border-radius:14px;flex:none;box-shadow:0 0 18px rgba(56,189,248,.35)}
+.dev-credit img{width:60px;height:60px;border-radius:16px;flex:none;background:#fff;padding:2px;box-shadow:0 0 0 2px rgba(56,189,248,.35),0 0 18px rgba(56,189,248,.3)}
 .dev-credit-main{flex:1;min-width:200px}
 .dev-credit-main small{display:block;font-size:11px;color:#93c5fd;letter-spacing:.06em}
 .dev-credit-main strong{display:block;font:700 17px var(--hf);color:#fff;margin:2px 0}

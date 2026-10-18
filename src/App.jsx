@@ -44,12 +44,10 @@ function SiteFavicon() {
   const { logo } = useSchoolData();
   useEffect(() => {
     if (!logo) return;
-    for (const rel of ["icon", "apple-touch-icon"]) {
-      let link = document.head.querySelector(`link[rel="${rel}"]`);
-      if (!link) { link = document.createElement("link"); link.rel = rel; document.head.appendChild(link); }
+    document.head.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach((link) => {
       link.removeAttribute("type");
       link.href = logo;
-    }
+    });
   }, [logo]);
   return null;
 }

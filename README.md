@@ -65,9 +65,7 @@ Login di `https://alamat-website/admin`, lalu isi berurutan:
 
 Statistik di beranda (peserta didik, GTK, kegiatan, prestasi) dihitung otomatis dari data yang sudah terbit.
 
-Ganti juga file berikut dengan versi resmi:
-- `public/assets/logo.png`: ikon tab browser (persegi, minimal 256×256).
-- `public/assets/og-image.png`: gambar pratinjau saat link dibagikan di WhatsApp/Facebook (1200×630).
+Logo resmi sudah terpasang di `public/assets/` (`logo.png`, `favicon-48.png`, `apple-touch-icon.png`) dan dipakai di gambar pratinjau link `og-image.png` (1200×630). Jika logo berubah, ganti file-file tersebut. Logo yang diunggah di Profil Sekolah juga otomatis dipakai sebagai ikon tab.
 
 ## 4. Setelah online
 

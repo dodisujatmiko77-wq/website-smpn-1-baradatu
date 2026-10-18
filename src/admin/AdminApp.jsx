@@ -50,7 +50,7 @@ const fieldMap = {
   agenda: [['nama','Nama Agenda'],['tgl','Tanggal','date'],['jam','Jam (mis. 07.30 WIB)'],['lokasi','Lokasi'],['description','Deskripsi','textarea']],
   achievements: [['nama','Nama Prestasi'],['siswa','Siswa / Tim'],['tingkat','Tingkat (mis. Kabupaten)'],['tahun','Tahun','number'],['foto','Foto','image'],['description','Keterangan','textarea']],
   gallery: [['judul','Judul'],['kat','Kategori','select',GALLERY_CATS],['foto','Foto','image'],['caption','Keterangan','textarea']],
-  services: [['nama','Nama Layanan'],['desk','Deskripsi','textarea'],['ikon','Ikon (emoji)'],['warna','Warna','color'],['url','URL (diawali https://)'],['tombol','Teks Tombol']],
+  services: [['nama','Nama Layanan'],['desk','Deskripsi','textarea'],['ikon','Ikon / Logo (unggah gambar persegi, atau ketik emoji)','icon'],['warna','Warna','color'],['url','URL (diawali https://)'],['tombol','Teks Tombol']],
   facilities: [['nama','Nama Fasilitas'],['deskripsi','Deskripsi','textarea'],['foto','Foto','image'],['urutan','Urutan','number']],
 };
 
@@ -59,6 +59,7 @@ function Field({ spec, value, onChange, folder }) {
   const v = value ?? '';
   const set = (e) => onChange(key, e.target.value);
   if (type === 'image') return <ImageField label={label} value={v} onChange={(url) => onChange(key, url)} folder={folder} wide />;
+  if (type === 'icon') return <ImageField label={label} value={v} onChange={(url) => onChange(key, url)} folder="layanan" maxSize={256} placeholder="Unggah logo, tempel URL, atau ketik emoji (mis. 📊)" wide />;
   if (type === 'textarea' || type === 'longtext') return <label style={{ gridColumn: '1 / -1' }}>{label}<textarea rows={type === 'longtext' ? 12 : 3} value={v} onChange={set} /></label>;
   if (type === 'select') return <label>{label}<select value={v} onChange={set}><option value="">— Pilih —</option>{options.map((o) => <option key={o} value={o}>{o}</option>)}</select></label>;
   if (type === 'color') return <label>{label}<input type="color" value={/^#[0-9a-f]{6}$/i.test(v) ? v : '#0f4c81'} onChange={set} /></label>;

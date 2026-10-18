@@ -53,3 +53,4 @@
 .admin-shell [hidden],.image-field input[type=file]{display:none!important}
 .image-field-controls input{margin-top:0}
 .image-field-buttons .mini-btn{margin-right:0}
+.image-field-preview.emoji{font-size:30px;color:inherit}

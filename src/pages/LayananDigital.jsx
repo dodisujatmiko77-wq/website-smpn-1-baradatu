@@ -1,4 +1,5 @@
 import PageShell from "../components/PageShell";
+import ServiceIcon from "../components/ServiceIcon";
 import { usePublicList } from "../data/publicData";
 
 const groups = [
@@ -47,7 +48,7 @@ export default function LayananDigitalPage() {
             {services.map((service) => (
               <article className="digital-card" key={service.id || service.nama}>
                 <div className="digital-card-top">
-                  <span className="digital-icon" style={{ background: service.warna }} aria-hidden="true">{service.ikon}</span>
+                  <ServiceIcon className="digital-icon" icon={service.ikon} color={service.warna} />
                 </div>
                 <h3>{service.nama}</h3>
                 <p>{service.desk}</p>

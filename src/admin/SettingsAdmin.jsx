@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { MAPS_EMBED_PREFIX, deleteExtra, fetchExtras, fetchSetting, saveExtra, saveSetting } from '../data/settingsStore';
-import { saveAuditRemote } from '../data/siteStore';
+import { Link } from 'react-router-dom';
+import { fetchSchoolSettings, saveAuditRemote, saveSchoolSettings } from '../data/siteStore';
 
 const audit = async (a, d) => { try { await saveAuditRemote(a, d); } catch { /* audit tidak boleh menghalangi simpan */ } };
 const isHttp = (u) => !u || /^https?:\/\//i.test(u.trim());
 
-function SettingForm({ settingKey, title, intro, defaults, children, validate }) {
+function SettingForm({ settingKey, title, intro, defaults, children, validate, before = null }) {
   const [v, setV] = useState(null);
   const [saving, setSaving] = useState(false);
   useEffect(() => {
@@ -26,6 +27,7 @@ function SettingForm({ settingKey, title, intro, defaults, children, validate })
   return (
     <div className="page-stack">
       <div className="section-intro"><span className="eyebrow">PENGATURAN</span><h1>{title}</h1><p>{intro}</p></div>
+      {before}
       <div className="admin-card form-card">
         {children(v, set)}
         <div className="form-actions"><button className="admin-btn primary" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan'}</button></div>
@@ -58,10 +60,42 @@ export function PpdbSettings() {
   );
 }
 
+// Alamat, telepon & email disimpan di Profil Sekolah; ditampilkan di sini agar mudah ditemukan.
+function SchoolContactCard() {
+  const [data, setData] = useState(null);
+  const [saving, setSaving] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    fetchSchoolSettings().then((x) => { if (alive) setData(x); }).catch((e) => alert(e.message || 'Gagal memuat profil sekolah.'));
+    return () => { alive = false; };
+  }, []);
+  if (!data) return <div className="admin-card empty">Memuat data…</div>;
+  const set = (k) => (e) => setData((p) => ({ ...p, [k]: e.target.value }));
+  async function save() {
+    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) { alert('Format email belum benar.'); return; }
+    setSaving(true);
+    try { await saveSchoolSettings(data); await audit('Mengubah kontak sekolah', 'Alamat, telepon, email'); alert('Alamat, telepon, dan email disimpan.'); }
+    catch (e) { alert(/permission|policy|row-level/i.test(e.message || '') ? 'Akun Anda tidak memiliki izin mengubah data ini. Hubungi admin/superadmin.' : (e.message || 'Gagal menyimpan.')); }
+    finally { setSaving(false); }
+  }
+  return (
+    <div className="admin-card form-card">
+      <div className="card-title"><div><span className="eyebrow">KONTAK UTAMA</span><h3>Alamat, Telepon &amp; Email Sekolah</h3></div></div>
+      <div className="form-grid">
+        <label style={{ gridColumn: '1 / -1' }}>Alamat<input value={data.alamat || ''} onChange={set('alamat')} /></label>
+        <label>Telepon<input value={data.telp || ''} onChange={set('telp')} placeholder="08xxxxxxxxxx" /></label>
+        <label>Email Sekolah<input type="email" value={data.email || ''} onChange={set('email')} placeholder="info@sekolah.sch.id" /></label>
+      </div>
+      <div className="form-note">ℹ️ Data ini sama dengan yang ada di <Link to="/admin/profil">Profil Sekolah</Link>, dan tampil di bagian Kontak, halaman Profil, serta footer website. Ini <b>bukan</b> email login admin.</div>
+      <div className="form-actions"><button className="admin-btn primary" onClick={save} disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan Kontak Utama'}</button></div>
+    </div>
+  );
+}
+
 export function ContactSettings() {
   return (
-    <SettingForm settingKey="contact" title="Kontak & Sosial Media" defaults={{}}
-      intro="Alamat, telepon, dan email diambil dari Profil Sekolah. Di sini Anda mengatur jam layanan, WhatsApp, peta, dan sosial media."
+    <SettingForm settingKey="contact" title="Kontak & Sosial Media" defaults={{}} before={<SchoolContactCard />}
+      intro="Atur kontak utama sekolah, jam layanan, WhatsApp, peta Google Maps, dan tautan sosial media."
       validate={(v) => {
         if (['maps', 'facebook', 'instagram', 'youtube', 'tiktok'].some((k) => !isHttp(v[k]))) return 'Semua link harus diawali https://';
         if (v.mapsEmbed && !v.mapsEmbed.trim().startsWith(MAPS_EMBED_PREFIX)) return `Link peta sematan harus diawali ${MAPS_EMBED_PREFIX}`;

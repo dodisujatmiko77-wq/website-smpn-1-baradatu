@@ -282,26 +282,91 @@ export async function saveAuditRemote(action, detail) {
 }
 
 // --- Upload foto ---------------------------------------------------------------
+// Foto diperkecil dulu di browser (foto HP 3–8 MB menjadi ±100–400 KB) agar unggah cepat dan tidak gagal.
 // Supabase aktif: file disimpan di bucket publik `site-media` dan URL publiknya dikembalikan.
 // Mode prototype: gambar disimpan sebagai data URL di browser (hanya untuk uji coba).
-const MAX_UPLOAD_MB = 5;
+const MAX_INPUT_MB = 25;      // batas file yang dipilih (sebelum diperkecil)
+const MAX_UPLOAD_MB = 5;      // batas setelah diperkecil
+const UPLOAD_TIMEOUT_MS = 90000;
 
-export async function uploadMedia(file, folder = 'umum') {
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+}
+
+async function loadImage(file) {
+  if (typeof createImageBitmap === 'function') {
+    try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch { /* lanjut ke cara lama */ }
+  }
+  return await new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('File tidak dapat dibaca sebagai gambar. Coba simpan ulang foto sebagai JPG/PNG.')); };
+    img.src = url;
+  });
+}
+
+// Mengecilkan sisi terpanjang menjadi maxSize piksel dan mengubah ke WEBP (transparansi tetap terjaga).
+export async function shrinkImage(file, maxSize = 1600) {
+  if (file.type === 'image/gif') return file; // GIF animasi dibiarkan apa adanya
+  const img = await loadImage(file);
+  const w = img.width, h = img.height;
+  const scale = Math.min(1, maxSize / Math.max(w, h));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(w * scale));
+  canvas.height = Math.max(1, Math.round(h * scale));
+  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+  if (img.close) img.close();
+  let blob = await canvasToBlob(canvas, 'image/webp', 0.85);
+  if (!blob || blob.type !== 'image/webp') blob = await canvasToBlob(canvas, file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
+  if (!blob) return file;
+  // Jika hasilnya justru lebih besar (mis. gambar sudah kecil), pakai file asli
+  if (blob.size >= file.size && scale === 1) return file;
+  const ext = blob.type.split('/')[1].replace('jpeg', 'jpg');
+  return new File([blob], `${(file.name || 'foto').replace(/\.[^.]+$/, '')}.${ext}`, { type: blob.type });
+}
+
+function explainUploadError(error) {
+  const m = String((error && (error.message || error.error)) || error || '');
+  if (/bucket not found/i.test(m)) return 'Tempat penyimpanan foto (bucket "site-media") belum ada. Jalankan ulang supabase/setup-all.sql di Supabase SQL Editor.';
+  if (/row-level security|violates|unauthorized|not authorized|403/i.test(m)) return 'Akun ini belum diizinkan mengunggah foto. Pastikan akun memiliki peran admin/editor, lalu keluar dan masuk lagi.';
+  if (/jwt|token|expired/i.test(m)) return 'Sesi login sudah habis. Silakan keluar lalu masuk lagi.';
+  if (/payload too large|413|exceeded the maximum/i.test(m)) return `Ukuran foto terlalu besar. Maksimal ${MAX_UPLOAD_MB} MB.`;
+  if (/failed to fetch|network|load failed|timeout|waktu/i.test(m)) return 'Koneksi internet terputus atau terlalu lambat saat mengunggah. Coba lagi.';
+  return `Gagal mengunggah foto: ${m || 'kesalahan tidak diketahui'}`;
+}
+
+export async function uploadMedia(file, folder = 'umum', { maxSize = 1600, onStatus } = {}) {
   if (!file) throw new Error('Pilih file terlebih dahulu.');
-  if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) throw new Error('Format foto harus JPG, PNG, WEBP, atau GIF.');
-  if (file.size > MAX_UPLOAD_MB * 1024 * 1024) throw new Error(`Ukuran foto maksimal ${MAX_UPLOAD_MB} MB.`);
+  if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) throw new Error('Format foto harus JPG, PNG, WEBP, atau GIF. (Format HEIC dari iPhone: ubah dulu ke JPG.)');
+  if (file.size > MAX_INPUT_MB * 1024 * 1024) throw new Error(`File terlalu besar (maks. ${MAX_INPUT_MB} MB).`);
+  if (onStatus) onStatus('Memperkecil foto…');
+  const ready = await shrinkImage(file, maxSize);
+  if (ready.size > MAX_UPLOAD_MB * 1024 * 1024) throw new Error(`Ukuran foto setelah diperkecil masih di atas ${MAX_UPLOAD_MB} MB. Gunakan foto lain.`);
   if (!isSupabaseConfigured || !supabase) {
     return await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
       reader.onerror = () => reject(new Error('Gagal membaca file.'));
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(ready);
     });
   }
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (onStatus) onStatus('Mengunggah…');
+  const ext = (ready.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
   const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await supabase.storage.from('site-media').upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type });
-  if (error) throw error;
+  let timer;
+  try {
+    const timeout = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('timeout: waktu unggah habis')), UPLOAD_TIMEOUT_MS); });
+    const { error } = await Promise.race([
+      supabase.storage.from('site-media').upload(path, ready, { cacheControl: '31536000', upsert: false, contentType: ready.type }),
+      timeout,
+    ]);
+    if (error) throw error;
+  } catch (error) {
+    throw new Error(explainUploadError(error));
+  } finally {
+    clearTimeout(timer);
+  }
   return supabase.storage.from('site-media').getPublicUrl(path).data.publicUrl;
 }
 

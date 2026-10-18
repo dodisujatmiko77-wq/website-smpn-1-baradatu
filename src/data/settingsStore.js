@@ -50,18 +50,21 @@ export const DEFAULT_SCHEDULE = DAYS.map((hari, i) => ({
 }));
 const fmtTime = (t) => String(t || '').trim().replace(':', '.');
 
-// Hari berurutan dengan jam yang sama digabung: "Senin - Kamis: 07.00 - 14.00 WIB"
-export function scheduleLines(jadwal) {
+// Hari berurutan dengan jam yang sama digabung: { hari: "Senin – Kamis", jam: "07.00 – 14.00", tutup: false }
+export function scheduleRows(jadwal) {
   if (!Array.isArray(jadwal) || !jadwal.length) return [];
   const rows = DAYS.map((hari) => jadwal.find((d) => d.hari === hari) || { hari, buka: false });
-  const key = (d) => (d.buka && d.mulai && d.selesai ? `${fmtTime(d.mulai)} - ${fmtTime(d.selesai)} WIB` : 'Tutup');
+  const key = (d) => (d.buka && d.mulai && d.selesai ? `${fmtTime(d.mulai)} – ${fmtTime(d.selesai)}` : 'Tutup');
   const groups = [];
   rows.forEach((d) => {
     const k = key(d), last = groups[groups.length - 1];
     if (last && last.k === k) last.to = d.hari; else groups.push({ from: d.hari, to: d.hari, k });
   });
-  return groups.map((g) => `${g.from === g.to ? g.from : `${g.from} - ${g.to}`}: ${g.k}`);
+  return groups.map((g) => ({ hari: g.from === g.to ? g.from : `${g.from} – ${g.to}`, jam: g.k, tutup: g.k === 'Tutup' }));
 }
+
+// Versi teks: "Senin – Kamis: 07.00 – 14.00 WIB"
+export const scheduleLines = (jadwal) => scheduleRows(jadwal).map((r) => `${r.hari}: ${r.tutup ? 'Tutup' : `${r.jam} WIB`}`);
 
 function waLink(n) {
   const d = String(n || '').replace(/\D/g, '');
@@ -79,6 +82,7 @@ export function useContact() {
     return {
       ...contactData,
       jam: scheduleLines(s.jadwal).join('\n') || (filled(s.jam) ? s.jam.trim() : contactData.jam),
+      jadwalRows: scheduleRows(s.jadwal),
       wa: waLink(s.wa), maps: httpOnly(s.maps),
       embed: filled(s.mapsEmbed) && s.mapsEmbed.trim().startsWith(MAPS_EMBED_PREFIX) ? s.mapsEmbed.trim() : '',
       sosmed: SOCIAL.filter(([, k]) => httpOnly(s[k])).map(([n, k]) => [n, httpOnly(s[k])]),

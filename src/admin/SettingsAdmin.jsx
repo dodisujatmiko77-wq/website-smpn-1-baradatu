@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MAPS_EMBED_PREFIX, deleteExtra, fetchExtras, fetchSetting, saveExtra, saveSetting } from '../data/settingsStore';
+import { DAYS, DEFAULT_SCHEDULE, MAPS_EMBED_PREFIX, deleteExtra, scheduleLines, fetchExtras, fetchSetting, saveExtra, saveSetting } from '../data/settingsStore';
 import { Link } from 'react-router-dom';
 import { fetchSchoolSettings, saveAuditRemote, saveSchoolSettings } from '../data/siteStore';
 
@@ -60,6 +60,29 @@ export function PpdbSettings() {
   );
 }
 
+// Jam layanan per hari (Senin–Minggu), masing-masing bisa buka/tutup dengan jam berbeda
+function ScheduleEditor({ value, onChange }) {
+  const rows = DAYS.map((hari) => (value || []).find((d) => d.hari === hari) || DEFAULT_SCHEDULE.find((d) => d.hari === hari));
+  const toInput = (t) => String(t || '').replace('.', ':');
+  const update = (hari, patch) => onChange(rows.map((d) => (d.hari === hari ? { ...d, ...patch } : d)));
+  const preview = scheduleLines(rows);
+  return (
+    <div className="schedule-editor" style={{ gridColumn: '1 / -1' }}>
+      <b>Jam Layanan</b>
+      <table><thead><tr><th>Hari</th><th>Buka</th><th>Mulai</th><th>Selesai</th></tr></thead>
+        <tbody>{rows.map((d) => (
+          <tr key={d.hari} className={d.buka ? '' : 'closed'}>
+            <td>{d.hari}</td>
+            <td><input type="checkbox" checked={!!d.buka} onChange={(e) => update(d.hari, { buka: e.target.checked })} aria-label={`${d.hari} buka`} /></td>
+            <td><input type="time" value={toInput(d.mulai)} disabled={!d.buka} onChange={(e) => update(d.hari, { mulai: e.target.value.replace(':', '.') })} aria-label={`${d.hari} jam mulai`} /></td>
+            <td><input type="time" value={toInput(d.selesai)} disabled={!d.buka} onChange={(e) => update(d.hari, { selesai: e.target.value.replace(':', '.') })} aria-label={`${d.hari} jam selesai`} /></td>
+          </tr>
+        ))}</tbody></table>
+      <div className="schedule-preview"><span>Tampil di website:</span>{preview.map((l) => <div key={l}>{l}</div>)}</div>
+    </div>
+  );
+}
+
 // Alamat, telepon & email disimpan di Profil Sekolah; ditampilkan di sini agar mudah ditemukan.
 function SchoolContactCard() {
   const [data, setData] = useState(null);
@@ -98,12 +121,14 @@ export function ContactSettings() {
       intro="Atur kontak utama sekolah, jam layanan, WhatsApp, peta Google Maps, dan tautan sosial media."
       validate={(v) => {
         if (['maps', 'facebook', 'instagram', 'youtube', 'tiktok'].some((k) => !isHttp(v[k]))) return 'Semua link harus diawali https://';
+        const bad = (v.jadwal || []).find((d) => d.buka && (!d.mulai || !d.selesai || d.mulai.replace('.', ':') >= d.selesai.replace('.', ':')));
+        if (bad) return `Jam layanan hari ${bad.hari} belum benar: jam selesai harus setelah jam mulai.`;
         if (v.mapsEmbed && !v.mapsEmbed.trim().startsWith(MAPS_EMBED_PREFIX)) return `Link peta sematan harus diawali ${MAPS_EMBED_PREFIX}`;
         return '';
       }}>
       {(v, set) => <>
         <div className="form-grid">
-          {input(v, set, 'jam', 'Jam Layanan', 'Senin - Jumat, 07.00 - 15.00 WIB')}
+          <ScheduleEditor value={v.jadwal} onChange={(jadwal) => set('jadwal')({ target: { type: 'text', value: jadwal } })} />
           {input(v, set, 'wa', 'Nomor WhatsApp', '08xxxxxxxxxx')}
           {input(v, set, 'maps', 'Link Google Maps (tombol)', 'https://maps.app.goo.gl/...')}
           {input(v, set, 'mapsEmbed', 'Link Peta Sematan (embed)', `${MAPS_EMBED_PREFIX}?pb=...`)}

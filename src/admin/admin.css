@@ -54,3 +54,15 @@
 .image-field-controls input{margin-top:0}
 .image-field-buttons .mini-btn{margin-right:0}
 .image-field-preview.emoji{font-size:30px;color:inherit}
+
+/* Jam layanan per hari */
+.schedule-editor>b{display:block;font-size:12px;color:#334155;margin-bottom:6px}
+.schedule-editor table{width:100%;max-width:560px;border-collapse:collapse;font-size:13px}
+.schedule-editor th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;padding:6px 8px;border-bottom:1px solid #e2e8f0}
+.schedule-editor td{padding:5px 8px;border-bottom:1px solid #f1f5f9}
+.schedule-editor td:first-child{font-weight:700;width:90px}
+.schedule-editor input[type=time]{display:inline-block;width:auto;margin:0;padding:6px 8px}
+.schedule-editor input[type=checkbox]{display:inline-block;width:auto;margin:0}
+.schedule-editor tr.closed td{color:#94a3b8}
+.schedule-preview{margin-top:10px;padding:10px 12px;background:#f0f9ff;border-radius:10px;font-size:12px;color:#0c4a6e;max-width:560px}
+.schedule-preview span{display:block;font-weight:700;margin-bottom:3px}

@@ -39,7 +39,7 @@ export default function Kontak({ bare }) {
               <div className="contact-card-icon" aria-hidden="true">{item.icon}</div>
               <div className="contact-card-body">
                 <b>{item.label}</b>
-                <span>{item.value}</span>
+                <span style={{ whiteSpace: "pre-line" }}>{item.value}</span>
               </div>
             </Card>
           ))}

@@ -43,6 +43,26 @@ export function usePpdb() {
   }), [s]);
 }
 
+// --- Jam layanan per hari ---
+export const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+export const DEFAULT_SCHEDULE = DAYS.map((hari, i) => ({
+  hari, buka: i < 6, mulai: '07.00', selesai: i === 4 ? '11.00' : i === 5 ? '12.00' : '14.00',
+}));
+const fmtTime = (t) => String(t || '').trim().replace(':', '.');
+
+// Hari berurutan dengan jam yang sama digabung: "Senin - Kamis: 07.00 - 14.00 WIB"
+export function scheduleLines(jadwal) {
+  if (!Array.isArray(jadwal) || !jadwal.length) return [];
+  const rows = DAYS.map((hari) => jadwal.find((d) => d.hari === hari) || { hari, buka: false });
+  const key = (d) => (d.buka && d.mulai && d.selesai ? `${fmtTime(d.mulai)} - ${fmtTime(d.selesai)} WIB` : 'Tutup');
+  const groups = [];
+  rows.forEach((d) => {
+    const k = key(d), last = groups[groups.length - 1];
+    if (last && last.k === k) last.to = d.hari; else groups.push({ from: d.hari, to: d.hari, k });
+  });
+  return groups.map((g) => `${g.from === g.to ? g.from : `${g.from} - ${g.to}`}: ${g.k}`);
+}
+
 function waLink(n) {
   const d = String(n || '').replace(/\D/g, '');
   if (!d) return '';
@@ -58,7 +78,7 @@ export function useContact() {
     if (!s) return { ...contactData, embed: '' };
     return {
       ...contactData,
-      jam: filled(s.jam) ? s.jam.trim() : contactData.jam,
+      jam: scheduleLines(s.jadwal).join('\n') || (filled(s.jam) ? s.jam.trim() : contactData.jam),
       wa: waLink(s.wa), maps: httpOnly(s.maps),
       embed: filled(s.mapsEmbed) && s.mapsEmbed.trim().startsWith(MAPS_EMBED_PREFIX) ? s.mapsEmbed.trim() : '',
       sosmed: SOCIAL.filter(([, k]) => httpOnly(s[k])).map(([n, k]) => [n, httpOnly(s[k])]),
